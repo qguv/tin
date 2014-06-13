@@ -45,6 +45,8 @@ func main() {
 	}
 	defer termbox.Close()
 
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+
 	event_queue := make(chan termbox.Event)
 	go func() {
 		for {
@@ -52,9 +54,10 @@ func main() {
 		}
 	}()
 
+	drawTinLogo()
+
 gameLoop:
 	for {
-		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 		select {
 		case ev := <-event_queue:
 			if ev.Type == termbox.EventKey {
@@ -66,9 +69,8 @@ gameLoop:
 				}
 			}
 		default:
-			drawTinLogo()
+			termbox.Flush()
 			time.Sleep(10 * time.Millisecond)
 		}
-		termbox.Flush()
 	}
 }
