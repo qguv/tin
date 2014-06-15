@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type cardinal uint8
 
 const (
@@ -22,7 +24,6 @@ const (
 )
 
 type castle_size uint8
-
 const (
 	small castle_size = iota
 	large
@@ -30,14 +31,22 @@ const (
 )
 
 type castle_workshop rune
-
 const (
 	alchemy  = '⚗'
 	military = '⚔'
 	economy  = '⊚'
 	industry = '⚒'
-	intrigue = rune{"✉︎"}
+	intrigue = "\u2709"
 	arts     = '❦'
+)
+
+type wall_weight uint8
+const (
+	broken wall_weight = iota
+	dashed
+	thin
+	thick
+	double
 )
 
 type castle struct {
@@ -45,68 +54,51 @@ type castle struct {
 	size     castle_size
 	towers   []castle_workshop
 	gates    []cardinal
-	walls    []cardinal
-	material material
+	weight   wall_weight
 }
 
 // String builds a visual representation of a castle to be displayed to the
 // user. String is capitalized by convention, see
 // http://golang.org/doc/effective_go.html#conversions
-func (c castle) String() (s string) {
-	var x, y, tower_w, tower_h int
-
-	switch castle.size {
-	case small:
-		x = 20
-		y = 20
-		tower_w = 5
-		tower_h = 3
-	case large:
-		x = 30
-		y = 30
-		tower_w = 7
-		tower_h = 4
-	case enormous:
-		x = 40
-		y = 40
-		tower_w = 9
-		tower_h = 5
-	}
-
-	var tower string
+func (c castle) String() string {
 	var corners [4]rune
 	var midpoints [4]rune
 	var h, v, h_in, v_in rune
 
-	switch castle.style {
+	switch c.style {
 	case mexican:
-		corners = [4]rune{"╭", "╮", "╰", "╯"}
-		midpoints = [4]rune{"╥", "╡", "╨", "╞"}
-		h = rune{"─"}
-		v = rune{"│"}
-		h_in = rune{"═"}
-		v_in = rune{"║"}
+		corners = [4]rune{'╭', '╮', '╰', '╯'}
+		midpoints = [4]rune{'╥', '╡', '╨', '╞'}
+		h = '─'
+		v = '│'
+		h_in = '═'
+		v_in = '║'
 	}
 
-	for i_v := v; i_v > 1; i-- {
+	num_others := h - 2 - 1 // minus two for corners, minus one for midpoint
+
+	var tower [][]rune
+	var t_line []rune
+
+	for i_v := v; i_v > 1; i_v-- {
 		var left_edge, right_edge, mid, others rune
 
 		switch i_v {
 		case v:
-			left_edge = corner[0]
-			right_edge = corner[1]
+			left_edge = corners[0]
+			right_edge = corners[1]
 			others = h
-			mid = midpoint[0]
+			mid = midpoints[0]
 		case 1:
-			left_edge = corner[2]
-			right_edge = corner[3]
+			left_edge = corners[2]
+			right_edge = corners[3]
 			others = h
-			mid = midpoint[2]
+			mid = midpoints[2]
 		case v/2 + 1: //midpoint
-			left_edge = midpoint[3]
-			right_edge = midpoint[1]
+			left_edge = midpoints[3]
+			right_edge = midpoints[1]
 			others = h_in
-			mid = rune{' '} //TODO
+			mid = ' ' //TODO
 		default:
 			left_edge = v
 			right_edge = v
@@ -114,35 +106,52 @@ func (c castle) String() (s string) {
 			mid = v_in
 		}
 
+		t_line = []rune{left_edge}
+
+		for i := num_others / 2; i > 0; i-- {
+			t_line = append(t_line, others)
+		}
+
+		t_line = append(t_line, mid)
+
+		for i := num_others / 2; i > 0; i-- {
+			t_line = append(t_line, others)
+		}
+
+		t_line = append(t_line, right_edge)
+
 		// we've built variables for each line of the string representing a
 		// tower. now we've got to append those variables smartly to a runeslice
 		// representing the whole thing. left to implement is connecting
 		// corners. fuck.
+
+		tower = append(tower, t_line)
 	}
 
-	var rs_first, rs_last []rune
-	rs_first = append(rs_first, left_edge)
-	num_h := h - 2 - 1 // minus two for corners, minus one for midpoint
-
-	// construct left of midpoint
-	for i:=num_h/2; i < 0; i-- {
-		rs_first = append(rs_first, h)
+	var tower_joined []rune
+	for _, t := range tower {
+		tower_joined = append(tower_joined, t...)
+		tower_joined = append(tower_joined, '\n')
 	}
+	return string(tower_joined)
 
-	// construct midpoint
-	rs_first = append(rs_first, midpoints[0])
+	//"╭─╥─╮"
+	//"╞═℥═╡"
+	//"╰─╨─╯"
+}
 
-	// construct right of midpoint
-	for i:=num_h/2; i > 0; i-- {
-		rs_first = append(rs_first, h)
+func main() {
+	c := castle{
+		style: mexican,
+		size: small,
+		towers: []castle_workshop{
+			alchemy,
+			economy,
+			military,
+			arts,
+		},
+		gates: []cardinal{east},
+		weight: thin,
 	}
-
-	// tack on final edge
-	rs_first = append(rs_first, right_edge)
-
-
-
-	"╭─╥─╮"
-	"╞═℥═╡"
-	"╰─╨─╯"
+	fmt.Printf(c.String())
 }
