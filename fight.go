@@ -34,7 +34,8 @@ func calcCombatSkill(p person) int {
 }
 
 type attackable interface {
-	defend
+	defend()
 }
 
-func (p *person) attack()
+func (p *person) attack() {
+}
