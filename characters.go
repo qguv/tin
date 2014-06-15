@@ -2,83 +2,83 @@ package main
 
 import "math/rand"
 
-type Equiped struct {
-	Armor  map[Armor]ArmorEquip
-	Weapon WeaponEquip
-	Tool   ToolEquip
+type equiped struct {
+	armor  map[armor]armorEquip
+	weapon weaponEquip
+	tool   toolEquip
 }
 
-type Profession int
+type profession int
 
 const (
-	Vagrant = iota
-	Laborer
-	Farmer
-	Soldier
-	Craftsman
-	Merchant
-	Officer
-	Scientist
-	Bureaucrat
-	Noble
+	vagrant = iota
+	laborer
+	farmer
+	soldier
+	craftsman
+	merchant
+	officer
+	scientist
+	bureaucrat
+	noble
 	numProfessions
 )
 
-type Nobility int
+type nobility int
 
 const (
-	Commoner = iota
-	Knight
-	Baron
-	Viscount
-	Count
-	Duke
-	Archduke
-	Prince
-	King
+	commoner = iota
+	knight
+	baron
+	viscount
+	count
+	duke
+	archduke
+	prince
+	king
 )
 
-type Person struct {
-	Skills
-	Attributes
-	Equiped
-	Health
-	Name       string
-	Age        int
-	Male       bool
-	Profession Profession
-	Nobility   Nobility
-	Father     *Person
-	Mother     *Person
-	Carried    []Carriable
-	Holdings   []Ownable
+type person struct {
+	skills
+	attributes
+	equiped
+	health
+	name       string
+	age        int
+	male       bool
+	profession profession
+	nobility   nobility
+	father     *person
+	mother     *person
+	carried    []carriable
+	holdings   []ownable
 }
 
-func (p *Person) GetWeaponSkill() int {
-	weapon := p.Equiped.Weapon.Weapon
-	return p.Skills.Weapons[weapon]
+func (p *person) getWeaponSkill() int {
+	weapon := p.equiped.weapon.weapon
+	return p.skills.weapons[weapon]
 }
 
-func RandPerson() Person {
-	prof := Profession(rand.Int31n(numProfessions))
-	person := NewPerson(prof)
+func randPerson() person {
+	prof := profession(rand.Int31n(numProfessions))
+	person := newPerson(prof)
 
 	if rand.Int31n(1) == 1 {
-		person.Male = true
+		person.male = true
 	} else {
-		person.Male = false
+		person.male = false
 	}
 
-	person.Age = int(rand.Int31n(22) + 18)
+	person.age = int(rand.Int31n(22) + 18)
 
 	return person
 }
 
-func NewPerson(p Profession) Person {
-	return Person{
-		Profession: p,
-		Skills:     NewSkills(p),
-		Attributes: NewAttributes(p),
-		Health:     NewHealth(),
+func newPerson(p profession) person {
+	return person{
+		profession: p,
+		skills:     newSkills(p),
+		attributes: newAttributes(p),
+		health:     newHealth(),
 	}
 }

@@ -21,118 +21,118 @@ func genSkill(dist [10]int) int {
 	return 10
 }
 
-func getFightExp(p Profession) bool {
+func getFightExp(p profession) bool {
 	switch {
-	case p == Soldier:
+	case p == soldier:
 		return true
-	case p == Officer:
+	case p == officer:
 		return true
 	}
 	return false
 }
 
-func getToolExp(p Profession) bool {
+func getToolExp(p profession) bool {
 	switch {
-	case p == Laborer:
+	case p == laborer:
 		return true
-	case p == Farmer:
+	case p == farmer:
 		return true
-	case p == Craftsman:
+	case p == craftsman:
 		return true
 	}
 	return false
 }
 
-func getPhysExp(p Profession) bool {
+func getPhysExp(p profession) bool {
 	switch {
-	case p == Laborer:
+	case p == laborer:
 		return true
-	case p == Farmer:
+	case p == farmer:
 		return true
-	case p == Soldier:
+	case p == soldier:
 		return true
-	case p == Officer:
+	case p == officer:
 		return true
 	}
 	return false
 }
 
-func getIntExp(p Profession) bool {
+func getIntExp(p profession) bool {
 	switch {
-	case p == Merchant:
+	case p == merchant:
 		return true
-	case p == Officer:
+	case p == officer:
 		return true
-	case p == Scientist:
+	case p == scientist:
 		return true
-	case p == Bureaucrat:
+	case p == bureaucrat:
 		return true
-	case p == Noble:
+	case p == noble:
 		return true
 	}
 	return false
 }
 
-func getToolSkill(p Profession) int {
+func getToolSkill(p profession) int {
 	return genSkill(getDist(getToolExp(p)))
 }
 
-func getFightSkill(p Profession) int {
+func getFightSkill(p profession) int {
 
 	return genSkill(getDist(getFightExp(p)))
 
 }
 
-func getPhysAtt(p Profession) int {
+func getPhysAtt(p profession) int {
 	return genSkill(getDist(getPhysExp(p)))
 }
 
-func getIntAtt(p Profession) int {
+func getIntAtt(p profession) int {
 	return genSkill(getDist(getIntExp(p)))
 }
 
-type Skills struct {
-	Weapons  map[Weapon]int
-	Tools    map[Tool]int
-	ArmorUse map[Armor]int
+type skills struct {
+	weapons  map[weapon]int
+	tools    map[tool]int
+	armorUse map[armor]int
 }
 
-type Attributes struct {
-	Strength     int
-	Agility      int
-	Accuracy     int
-	Intelligence int
-	Stamina      int
-	Social       int
+type attributes struct {
+	strength     int
+	agility      int
+	accuracy     int
+	intelligence int
+	stamina      int
+	social       int
 }
 
-func NewSkills(p Profession) Skills {
-	weapons := make(map[Weapon]int)
+func newSkills(p profession) skills {
+	weapons := make(map[weapon]int)
 	for x := 0; x < numWeapons; x++ {
-		weapons[Weapon(x)] = getFightSkill(p)
+		weapons[weapon(x)] = getFightSkill(p)
 	}
-	tools := make(map[Tool]int)
+	tools := make(map[tool]int)
 	for x := 0; x < numTools; x++ {
-		tools[Tool(x)] = getToolSkill(p)
+		tools[tool(x)] = getToolSkill(p)
 	}
-	armor := make(map[Armor]int)
+	armors := make(map[armor]int)
 	for x := 0; x < numArmor; x++ {
-		armor[Armor(x)] = getFightSkill(p)
+		armors[armor(x)] = getFightSkill(p)
 	}
-	return Skills{
-		Weapons:  weapons,
-		ArmorUse: armor,
-		Tools:    tools,
+	return skills{
+		weapons:  weapons,
+		armorUse: armors,
+		tools:    tools,
 	}
 }
 
-func NewAttributes(p Profession) Attributes {
-	return Attributes{
-		Strength:     getPhysAtt(p),
-		Agility:      getPhysAtt(p),
-		Accuracy:     getPhysAtt(p),
-		Intelligence: getIntAtt(p),
-		Stamina:      getPhysAtt(p),
-		Social:       getIntAtt(p),
+func newAttributes(p profession) attributes {
+	return attributes{
+		strength:     getPhysAtt(p),
+		agility:      getPhysAtt(p),
+		accuracy:     getPhysAtt(p),
+		intelligence: getIntAtt(p),
+		stamina:      getPhysAtt(p),
+		social:       getIntAtt(p),
 	}
 }

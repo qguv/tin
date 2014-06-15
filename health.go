@@ -1,56 +1,56 @@
 package main
 
-type Health struct {
-	Head    int
-	Chest   int
-	Stomach int
-	Back    int
-	LArm    int
-	RArm    int
-	LHand   int
-	RHand   int
-	LLeg    int
-	RLeg    int
-	LFoot   int
-	RFoot   int
+type health struct {
+	head    int
+	chest   int
+	stomach int
+	back    int
+	lArm    int
+	rArm    int
+	lHand   int
+	rHand   int
+	lLeg    int
+	rLeg    int
+	lFoot   int
+	rFoot   int
 }
 
-func NewHealth() Health {
-	return Health{
-		Head:    100,
-		Chest:   100,
-		Stomach: 100,
-		Back:    100,
-		LArm:    100,
-		RArm:    100,
-		LHand:   100,
-		RHand:   100,
-		LLeg:    100,
-		RLeg:    100,
-		LFoot:   100,
-		RFoot:   100,
+func newHealth() health {
+	return health{
+		head:    100,
+		chest:   100,
+		stomach: 100,
+		back:    100,
+		lArm:    100,
+		rArm:    100,
+		lHand:   100,
+		rHand:   100,
+		lLeg:    100,
+		rLeg:    100,
+		lFoot:   100,
+		rFoot:   100,
 	}
 }
 
 //
-func (h *Health) MovementCapacity() float32 {
-	general := h.Head + h.Chest + h.Stomach + h.Back + h.LLeg + h.RLeg + h.LFoot + h.RFoot
+func (h *health) movementCapacity() float32 {
+	general := h.head + h.chest + h.stomach + h.back + h.lLeg + h.rLeg + h.lFoot + h.rFoot
 	capacity := float32(general) / 800
 
 	// Check for broken bones
-	if h.LLeg <= 50 {
+	if h.lLeg <= 50 {
 		capacity /= 2
 	}
 
-	if h.RLeg <= 50 {
+	if h.rLeg <= 50 {
 		capacity /= 2
 	}
 
-	if h.LFoot <= 50 {
+	if h.lFoot <= 50 {
 		capacity /= 2
 	}
 
-	if h.RFoot <= 50 {
+	if h.rFoot <= 50 {
 		capacity /= 2
 	}
 

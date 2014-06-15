@@ -1,90 +1,90 @@
 package main
 
-type Material int
+type material int
 
 const (
-	Wood = iota
-	Stone
-	Tin
-	Copper
-	Iron
-	Steel
-	Adamantine
+	wood = iota
+	stone
+	tin
+	copper
+	iron
+	steel
+	adamantine
 )
 
-type Weapon int
+type weapon int
 
 const (
-	Knife = iota
-	Sword
-	BattleAxe
-	WarHammer
-	Pike
-	Bow
-	Crossbow
+	knife = iota
+	sword
+	battleAxe
+	warHammer
+	pike
+	bow
+	crossbow
 	numWeapons
 )
 
-type Tool int
+type tool int
 
 const (
-	Hoe = iota
-	Shovel
-	Hammer
-	Axe
-	Saw
+	hoe = iota
+	shovel
+	hammer
+	axe
+	saw
 	numTools
 )
 
-type Armor int
+type armor int
 
 const (
-	Helmet = iota
-	Chestplate
-	Gauntlets
-	Greaves
-	Boots
-	Shield
+	helmet = iota
+	chestplate
+	gauntlets
+	greaves
+	boots
+	shield
 	numArmor
 )
 
-type Equipment struct {
-	Name       string
-	Quality    int
-	Durability int
-	Weight     int
-	Material   Material
-	Owner      *Person
+type equipment struct {
+	name       string
+	quality    int
+	durability int
+	weight     int
+	material   material
+	owner      *person
 }
 
-type Carriable interface {
-	GetOwner() *Person
-	GetWeight() int
+type carriable interface {
+	getOwner() *person
+	getWeight() int
 }
 
-type Ownable interface {
-	GetOwner() *Person
+type ownable interface {
+	getOwner() *person
 }
 
-func (e *Equipment) GetOwner() *Person {
-	return e.Owner
+func (e *equipment) getOwner() *person {
+	return e.owner
 }
 
-func (e *Equipment) GetWeight() int {
-	return e.Weight
+func (e *equipment) getWeight() int {
+	return e.weight
 }
 
-type ToolEquip struct {
-	Equipment
-	Tool Tool
+type toolEquip struct {
+	equipment
+	tool tool
 }
 
-type WeaponEquip struct {
-	Equipment
-	Weapon Weapon
+type weaponEquip struct {
+	equipment
+	weapon weapon
 }
 
-type ArmorEquip struct {
-	Equipment
-	Armor Armor
+type armorEquip struct {
+	equipment
+	armor armor
 }
