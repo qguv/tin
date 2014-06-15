@@ -89,6 +89,6 @@ func newPerson(p profession) person {
 		profession: p,
 		skills:     newSkills(p),
 		attributes: newAttributes(p),
-		health:     newHealth(),
+		health:     newPersonHealth(),
 	}
 }

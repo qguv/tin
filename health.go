@@ -1,5 +1,8 @@
 package main
 
+import "math"
+
+// bodyPart is an enum of general types of body parts.
 type bodyPart int
 
 const (
@@ -7,74 +10,82 @@ const (
 	chest
 	stomach
 	back
-	lArm
 	rArm
-	lHand
+	lArm
 	rHand
-	lLeg
+	lHand
 	rLeg
-	lFoot
+	lLeg
 	rFoot
+	lFoot
+	numBodyParts
 )
+
+// bodyPartInstance is an instance of a body part with status.
+type bodyPartInstance struct {
+	bodyPart bodyPart
+	// out of 100
+	health   int
+	broken   bool
+	detached bool
+	infected bool
+	severed  bool
+}
 
 // health represents a characters health status.
 type health struct {
-	head    int
-	chest   int
-	stomach int
-	back    int
-	lArm    int
-	rArm    int
-	lHand   int
-	rHand   int
-	lLeg    int
-	rLeg    int
-	lFoot   int
-	rFoot   int
+	bodyParts []bodyPartInstance
+	// out of 100
+	blood   int
+	stamina int
 }
 
-// newHealth initializes health to 100.
-func newHealth() health {
+// newPersonHealth initializes health to 100.
+func newPersonHealth() health {
+	parts := make([]bodyPartInstance, 12)
+	for x := 0; x < numBodyParts; x++ {
+		parts = append(parts, bodyPartInstance{
+			bodyPart: bodyPart(x),
+			health:   100,
+		})
+	}
 	return health{
-		head:    100,
-		chest:   100,
-		stomach: 100,
-		back:    100,
-		lArm:    100,
-		rArm:    100,
-		lHand:   100,
-		rHand:   100,
-		lLeg:    100,
-		rLeg:    100,
-		lFoot:   100,
-		rFoot:   100,
+		bodyParts: parts,
+		blood:     100,
+		stamina:   100,
 	}
 }
+
+var (
+	movementCrucial = []bodyPart{
+		head,
+		back,
+		rLeg,
+		lLeg,
+		lFoot,
+		rFoot,
+		chest,
+		stomach,
+	}
+)
 
 // movementCapacity calculates a characters movement penalty
 // from taking damage. It first calculates overall health, and
 // then applies further redutions for broken bones.
 // It returns movement ability in decimal form. Ex: .5 = 50%
 func (h *health) movementCapacity() float32 {
-	general := h.head + h.chest + h.stomach + h.back + h.lLeg + h.rLeg + h.lFoot + h.rFoot
-	capacity := float32(general) / 800
-
-	// Check for broken bones
-	if h.lLeg <= 50 {
-		capacity /= 2
+	general := 0
+	disabled := 0
+	for _, x := range h.bodyParts {
+		general += x.health
+		if x.broken || x.infected || x.severed || x.detached {
+			disabled++
+		}
 	}
 
-	if h.rLeg <= 50 {
-		capacity /= 2
-	}
+	capacity := float32(general) / (100 * float32(len(h.bodyParts)))
 
-	if h.lFoot <= 50 {
-		capacity /= 2
-	}
-
-	if h.rFoot <= 50 {
-		capacity /= 2
-	}
+	capacity /= float32(math.Exp2(float64(disabled)))
 
 	return capacity
 
