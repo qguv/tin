@@ -2,12 +2,14 @@ package main
 
 import "math/rand"
 
+// equiped represents the equipment that a character is wearing / weilding.
 type equiped struct {
 	armor  map[armor]armorEquip
 	weapon weaponEquip
 	tool   toolEquip
 }
 
+// profession represents a characters general catagory of work.
 type profession int
 
 const (
@@ -24,6 +26,7 @@ const (
 	numProfessions
 )
 
+// nobility is the noble title held by a character.
 type nobility int
 
 const (
@@ -38,6 +41,7 @@ const (
 	king
 )
 
+// person represents a human type character.
 type person struct {
 	skills
 	attributes
@@ -54,11 +58,15 @@ type person struct {
 	holdings   []ownable
 }
 
+// getWeaponSkill returns the characters skill in using his equipped weapon.
+// returns 0 if nothing equipped.
 func (p *person) getWeaponSkill() int {
 	weapon := p.equiped.weapon.weapon
 	return p.skills.weapons[weapon]
 }
 
+// randPerson randomly chooses a profession,
+// and then generates a character of that profession.
 func randPerson() person {
 	prof := profession(rand.Int31n(numProfessions))
 	person := newPerson(prof)
@@ -74,6 +82,8 @@ func randPerson() person {
 	return person
 }
 
+// newPerson initializes a person with skill distribution
+// based on chosen profession.
 func newPerson(p profession) person {
 	return person{
 		profession: p,

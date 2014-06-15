@@ -1,5 +1,6 @@
 package main
 
+// health represents a characters health status.
 type health struct {
 	head    int
 	chest   int
@@ -15,6 +16,7 @@ type health struct {
 	rFoot   int
 }
 
+// newHealth initializes health to 100.
 func newHealth() health {
 	return health{
 		head:    100,
@@ -32,7 +34,10 @@ func newHealth() health {
 	}
 }
 
-//
+// movementCapacity calculates a characters movement penalty
+// from taking damage. It first calculates overall health, and
+// then applies further redutions for broken bones.
+// It returns movement ability in decimal form. Ex: .5 = 50%
 func (h *health) movementCapacity() float32 {
 	general := h.head + h.chest + h.stomach + h.back + h.lLeg + h.rLeg + h.lFoot + h.rFoot
 	capacity := float32(general) / 800

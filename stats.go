@@ -2,7 +2,11 @@ package main
 
 import "math/rand"
 
-//
+// getDist returns skill probability distribution based on wether
+// a character is experienced or not.
+// Index corresponds to skill level, and value at index is the
+// minimum roll needed to obtain that skill level.
+// ex: dist[5] = 75 means a roll of 75 is need to have level 5
 func getDist(skilled bool) [10]int {
 	if skilled {
 		return [10]int{5, 15, 25, 40, 60, 75, 90, 93, 95, 98}
@@ -11,6 +15,8 @@ func getDist(skilled bool) [10]int {
 	}
 }
 
+// genSkill takes in a probability distribution and rolls for
+// skill value.
 func genSkill(dist [10]int) int {
 	roll := int(rand.Int31n(100))
 	for result := 0; result < 10; result++ {
@@ -21,6 +27,8 @@ func genSkill(dist [10]int) int {
 	return 10
 }
 
+// getFightExp is an ugly function that keeps track of which
+// professions have experience in fighting.
 func getFightExp(p profession) bool {
 	switch {
 	case p == soldier:
@@ -31,6 +39,7 @@ func getFightExp(p profession) bool {
 	return false
 }
 
+// getToolExp another ugly exp func.
 func getToolExp(p profession) bool {
 	switch {
 	case p == laborer:
@@ -43,6 +52,7 @@ func getToolExp(p profession) bool {
 	return false
 }
 
+// getPhysExp another ugly exp func.
 func getPhysExp(p profession) bool {
 	switch {
 	case p == laborer:
@@ -57,6 +67,7 @@ func getPhysExp(p profession) bool {
 	return false
 }
 
+// getIntExp another ugly exp function.
 func getIntExp(p profession) bool {
 	switch {
 	case p == merchant:
@@ -73,30 +84,39 @@ func getIntExp(p profession) bool {
 	return false
 }
 
+// getToolSkill generates a starting tool skill for a profession.
 func getToolSkill(p profession) int {
 	return genSkill(getDist(getToolExp(p)))
 }
 
+// getFightSkill generates a starting fight (weapon/armor) skill
+// for a profession.
 func getFightSkill(p profession) int {
 
 	return genSkill(getDist(getFightExp(p)))
 
 }
 
+// getPhysAtt generates a starting physical attribute for a profession.
 func getPhysAtt(p profession) int {
 	return genSkill(getDist(getPhysExp(p)))
 }
 
+// getIntAtt generates a starting intelligence attribute for a profession.
 func getIntAtt(p profession) int {
 	return genSkill(getDist(getIntExp(p)))
 }
 
+// skills represents a characters skill at using equipment.
+// 0 - 10
 type skills struct {
 	weapons  map[weapon]int
 	tools    map[tool]int
 	armorUse map[armor]int
 }
 
+// attributes represent a characters personal traits.
+// 0 - 10
 type attributes struct {
 	strength     int
 	agility      int
@@ -106,6 +126,7 @@ type attributes struct {
 	social       int
 }
 
+// newSkills returns initialized skills for a profession.
 func newSkills(p profession) skills {
 	weapons := make(map[weapon]int)
 	for x := 0; x < numWeapons; x++ {
@@ -126,6 +147,7 @@ func newSkills(p profession) skills {
 	}
 }
 
+// newAttributes returns initialized attributes for a profession.
 func newAttributes(p profession) attributes {
 	return attributes{
 		strength:     getPhysAtt(p),
