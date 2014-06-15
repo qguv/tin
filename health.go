@@ -1,4 +1,4 @@
-package characters
+package main
 
 type Health struct {
 	Head    int

@@ -1,4 +1,4 @@
-package characters
+package main
 
 type Material int
 
@@ -47,8 +47,6 @@ const (
 	Shield
 	numArmor
 )
-
-i
 
 type Equipment struct {
 	Name       string
