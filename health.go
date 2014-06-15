@@ -1,5 +1,22 @@
 package main
 
+type bodyPart int
+
+const (
+	head = iota
+	chest
+	stomach
+	back
+	lArm
+	rArm
+	lHand
+	rHand
+	lLeg
+	rLeg
+	lFoot
+	rFoot
+)
+
 // health represents a characters health status.
 type health struct {
 	head    int

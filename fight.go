@@ -32,3 +32,9 @@ func calcCombatSkill(p person) int {
 	return sum / (numWeapons + numArmor)
 
 }
+
+type attackable interface {
+	defend
+}
+
+func (p *person) attack()
