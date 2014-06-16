@@ -38,7 +38,7 @@ func drawTinLogo() {
 	tbph("(ESC exits)", h - 1)
 }
 
-func main() {
+func runGameLoop() {
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
