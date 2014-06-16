@@ -19,7 +19,7 @@ func tbcenterwidth(y int, fg, bg termbox.Attribute, msg string) {
 
 func tbcenter(fg, bg termbox.Attribute, msg string) {
 	w, h := termbox.Size()
-	midh := h / 2 - 1
+	midh := h/2 - 1
 	lpad := (w - len(msg)) / 2
 	tbprint(lpad, midh, fg, bg, msg)
 }
@@ -29,13 +29,13 @@ func drawTinLogo() {
 		tbcenterwidth(h, termbox.ColorWhite, termbox.ColorDefault, m)
 	}
 	_, h := termbox.Size()
-	midh := h / 2 - 1
+	midh := h/2 - 1
 
-	tbph("✰ ✰ ✰ ✰ ✰", midh - 2)
+	tbph("✰ ✰ ✰ ✰ ✰", midh-2)
 	tbph(" T.I.N.! ", midh)
-	tbph("✰ ✰ ✰ ✰ ✰", midh + 2)
+	tbph("✰ ✰ ✰ ✰ ✰", midh+2)
 
-	tbph("(ESC exits)", h - 1)
+	tbph("(ESC exits)", h-1)
 }
 
 func runGameLoop() {
