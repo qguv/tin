@@ -36,7 +36,7 @@ const (
 	economy  = '⊚'      // coin
 	industry = '⚒'      // mallet and pick
 	intrigue = "\u2709" // a sealed letter
-	arts     = '❦'      // some artsy doilie
+	arts     = '♪'      // some artsy doilie
 )
 
 type wall_weight uint8
