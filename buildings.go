@@ -61,9 +61,9 @@ type castle struct {
 // user. String is capitalized by convention, see
 // http://golang.org/doc/effective_go.html#conversions
 func (c castle) String() string {
-	var corners [4]rune
-	var midpoints [4]rune
+	var corners, midpoints [4]rune
 	var h, v, h_in, v_in rune
+	var towerHeight, towerWidth int
 
 	switch c.style {
 	case mexican:
@@ -73,33 +73,35 @@ func (c castle) String() string {
 		v = '│'
 		h_in = '═'
 		v_in = '║'
+		towerHeight = 5
+		towerWidth = 9
 	}
 
-	num_others := h - 2 - 1 // minus two for corners, minus one for midpoint
+	num_others := towerWidth - 2 - 1 // minus two for corners, minus one for midpoint
 
 	var tower [][]rune
 	var t_line []rune
 
-	for i_v := v; i_v > 1; i_v-- {
+	for i_v := towerHeight; i_v >= 1; i_v-- {
 		var left_edge, right_edge, mid, others rune
 
 		switch i_v {
-		case v:
+		case towerHeight: // top
 			left_edge = corners[0]
 			right_edge = corners[1]
 			others = h
 			mid = midpoints[0]
-		case 1:
+		case 1: // bottom
 			left_edge = corners[2]
 			right_edge = corners[3]
 			others = h
 			mid = midpoints[2]
-		case v/2 + 1: //midpoint
+		case towerHeight/2 + 1: // middle
 			left_edge = midpoints[3]
 			right_edge = midpoints[1]
 			others = h_in
 			mid = ' ' //TODO
-		default:
+		default: // others
 			left_edge = v
 			right_edge = v
 			others = ' '
@@ -120,20 +122,14 @@ func (c castle) String() string {
 
 		t_line = append(t_line, right_edge)
 
-		// we've built variables for each line of the string representing a
-		// tower. now we've got to append those variables smartly to a runeslice
-		// representing the whole thing. left to implement is connecting
-		// corners. fuck.
-
 		tower = append(tower, t_line)
 	}
 
-	var tower_joined []rune
+	var s string
 	for _, t := range tower {
-		tower_joined = append(tower_joined, t...)
-		tower_joined = append(tower_joined, '\n')
+		s += string(t) + "\n"
 	}
-	return string(tower_joined)
+	return s
 
 	//"╭─╥─╮"
 	//"╞═℥═╡"
