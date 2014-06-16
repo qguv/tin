@@ -37,5 +37,5 @@ type attackable interface {
 	defend()
 }
 
-func (p *person) attack() {
+func (p *person) hit(t *person, bp bodyPart, contact int) {
 }

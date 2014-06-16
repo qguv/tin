@@ -13,6 +13,27 @@ const (
 	adamantine
 )
 
+func (m *material) getStrenght() int {
+	switch *m {
+	case wood:
+		return 2
+	case stone:
+		return 4
+	case tin:
+		return 5
+	case copper:
+		return 6
+	case iron:
+		return 7
+	case steel:
+		return 8
+	case adamantine:
+		return 10
+	default:
+		return 0
+	}
+}
+
 // weapon denotes the types of weapons.
 type weapon int
 
@@ -92,7 +113,10 @@ type toolEquip struct {
 // weaonEquip is a weapon instance.
 type weaponEquip struct {
 	equipment
-	weapon weapon
+	weapon    weapon
+	minDamage int
+	maxDamage int
+	armorPen  int
 }
 
 // armorEquip is an armor instance.
