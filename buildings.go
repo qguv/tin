@@ -15,15 +15,13 @@ type castle_style uint8
 
 const (
 	japanese castle_style = iota
-	slavic
-	w_euro   // western european, e.g. German, French
-	e_euro   // eastern european but non-slavic, e.g. Czech
-	baroque  // absurdly adorned
-	american // our unique style of old-world architecture
-	mexican  // mayan/aztec step designs
+	w_euro                // western european, e.g. German, French
+	american              // our unique style of old-world architecture
+	mexican               // mayan/aztec step designs
 )
 
 type castle_size uint8
+
 const (
 	small castle_size = iota
 	large
@@ -31,16 +29,18 @@ const (
 )
 
 type castle_workshop rune
+
 const (
-	alchemy  = '⚗'
-	military = '⚔'
-	economy  = '⊚'
-	industry = '⚒'
-	intrigue = "\u2709"
-	arts     = '❦'
+	alchemy  = '⚗'      // alembic
+	military = '⚔'      // crossed swords
+	economy  = '⊚'      // coin
+	industry = '⚒'      // mallet and pick
+	intrigue = "\u2709" // a sealed letter
+	arts     = '❦'      // some artsy doilie
 )
 
 type wall_weight uint8
+
 const (
 	broken wall_weight = iota
 	dashed
@@ -50,11 +50,11 @@ const (
 )
 
 type castle struct {
-	style    castle_style
-	size     castle_size
-	towers   []castle_workshop
-	gates    []cardinal
-	weight   wall_weight
+	style  castle_style
+	size   castle_size
+	towers []castle_workshop
+	gates  []cardinal
+	weight wall_weight
 }
 
 // String builds a visual representation of a castle to be displayed to the
@@ -73,8 +73,40 @@ func (c castle) String() string {
 		v = '│'
 		h_in = '═'
 		v_in = '║'
+	case japanese:
+		corners = [4]rune{'┯', '┯', '┷', '┷'}
+		midpoints = [4]rune{'━', '┤', '━', '├'}
+		h = '━'
+		v = '│'
+		h_in = ' '
+		v_in = ' '
+	case american:
+		corners = [4]rune{'╒', '╕', '╘', '╛'}
+		midpoints = [4]rune{'═', '┃', '═', '┃'}
+		h = '═'
+		v = '┃'
+		h_in = ' '
+		v_in = ' '
+	case w_euro:
+		square := '\u25fb'
+		corners = [4]rune{square, square, square, square}
+		midpoints = [4]rune{square, '┇', square, '┇'}
+		h = '╍'
+		v = '┇'
+		h_in = ' '
+		v_in = ' '
+	}
+
+	switch c.size {
+	case small:
+		towerHeight = 3
+		towerWidth = 5
+	case large:
 		towerHeight = 5
 		towerWidth = 9
+	case enormous:
+		towerHeight = 7
+		towerWidth = 13
 	}
 
 	num_others := towerWidth - 2 - 1 // minus two for corners, minus one for midpoint
@@ -130,24 +162,27 @@ func (c castle) String() string {
 		s += string(t) + "\n"
 	}
 	return s
-
-	//"╭─╥─╮"
-	//"╞═℥═╡"
-	//"╰─╨─╯"
 }
 
 func main() {
-	c := castle{
-		style: mexican,
-		size: small,
-		towers: []castle_workshop{
-			alchemy,
-			economy,
-			military,
-			arts,
-		},
-		gates: []cardinal{east},
-		weight: thin,
+	var c castle
+	sizes := []castle_size{small, large}
+	styles := []castle_style{w_euro, japanese, mexican, american}
+	for _, style := range styles {
+		for _, size := range sizes {
+			c = castle{
+				style: style,
+				size:  size,
+				towers: []castle_workshop{
+					alchemy,
+					economy,
+					military,
+					arts,
+				},
+				gates:  []cardinal{east},
+				weight: thin,
+			}
+			fmt.Printf(c.String())
+		}
 	}
-	fmt.Printf(c.String())
 }
