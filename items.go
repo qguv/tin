@@ -116,11 +116,24 @@ type weaponEquip struct {
 	weapon    weapon
 	minDamage int
 	maxDamage int
-	armorPen  int
+	sharpness int
+	bluntness int
 }
 
 // armorEquip is an armor instance.
 type armorEquip struct {
 	equipment
-	armor armor
+	armor     armor
+	equipedOn *bodyPartInstance
+	strength  int
+	hardness  int
+	dampening int
+}
+
+func (a *armorEquip) getHardness() int {
+	return int(float32(a.hardness)*(float32(a.durability)/100.0) + .5)
+}
+
+func (a *armorEquip) getDampening() int {
+	return int(float32(a.dampening)*(float32(a.durability)/100.0) + .5)
 }
