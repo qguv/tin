@@ -131,9 +131,9 @@ type armorEquip struct {
 }
 
 func (a *armorEquip) getHardness() int {
-	return int(float32(a.hardness)*(float32(a.durability)/100.0) + .5)
+	return calcDamageRatio(a.hardness, a.durability)
 }
 
 func (a *armorEquip) getDampening() int {
-	return int(float32(a.dampening)*(float32(a.durability)/100.0) + .5)
+	return calcDamageRatio(a.dampening, a.durability)
 }
