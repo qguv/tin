@@ -55,12 +55,16 @@ func (b *bodyPartInstance) takeDamage(blunt int, cut int) {
 }
 
 func (a *armorEquip) takeDamage(damage int, blunt int, cut int) {
-	half := int(float32(damage)/2 + .5)
-	bluntDamage := calcArmorPen(half, blunt, a.getDampening())
-	cutDamage := calcArmorPen(half, cut, a.getHardness())
+
+	bluntTransfered := calcDamageRatio(damage, blunt)
+	cutTransfered := calcDamageRatio(damage, cut)
+
+	bluntDamage := bluntTransfered - calcDamageRatio(bluntTransfered, a.getDampening())
+	cutDamage := cutTransfered - calcDamageRatio(cutTransfered, a.getHardness())
+
 	a.equipedOn.takeDamage(bluntDamage, cutDamage)
 
-	armorDamage := int(float32(damage)*(float32(100-a.strength)/100) + .5)
+	armorDamage := damage - calcDamageRatio(damage, a.strength)
 
 	if armorDamage >= a.durability {
 		a.durability = 0
@@ -69,16 +73,9 @@ func (a *armorEquip) takeDamage(damage int, blunt int, cut int) {
 	}
 }
 
-func calcArmorPen(damage int, penetration int, resist int) int {
+func calcDamageRatio(damage int, ratio int) int {
 
-	var res int
-	if penetration >= resist {
-		res = 0
-	} else {
-		res = resist - penetration
-	}
+	damage = int(float32(damage)*(float32(ratio)/100.0) + .5)
 
-	blocked := int(float32(damage)*(float32(res)/100.0) + .5)
-
-	return damage - blocked
+	return damage
 }
