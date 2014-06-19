@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+import "strings"
 
 type cardinal uint8
 
@@ -39,129 +40,310 @@ const (
 	arts     = '♪'      // some artsy doilie
 )
 
-type wall_weight uint8
+type wall_thickness uint8
 
 const (
-	broken wall_weight = iota
+	thick wall_thickness = iota
+	double
 	dashed
 	thin
-	thick
-	double
+	broken
 )
 
 type castle struct {
-	style  castle_style
-	size   castle_size
-	towers []castle_workshop
-	gates  []cardinal
-	weight wall_weight
+	style     castle_style
+	size      castle_size
+	towers    []castle_workshop
+	gates     []cardinal
+	thickness wall_thickness
 }
 
-// String builds a visual representation of a castle to be displayed to the
-// user. String is capitalized by convention, see
-// http://golang.org/doc/effective_go.html#conversions
-func (c castle) String() string {
-	var corners, midpoints [4]rune
-	var h, v, h_in, v_in rune
-	var towerHeight, towerWidth int
+// castle.towerString builds a visual representation of a tower in a castle.
+func (c castle) towerString() string {
 
+	// Height of the tower
+	var v_count, h_count int
+
+	// Different sizes of castle have different sized towers
+	switch c.size {
+	case small:
+		v_count = 3
+		h_count = 5
+	case large:
+		v_count = 5
+		h_count = 9
+	case enormous:
+		v_count = 7
+		h_count = 13
+	}
+
+	// Amount of non-edge, non-midpoint pieces in each row. Defined as the
+	// tower's width minus two for edges minus one for the midpoint
+	o_count := h_count - 2 - 1
+
+	// "Pieces" (runes) of the outer horizontal and vertical edges of the tower
+	var p_hout, p_vout rune
+
+	// "Pieces" (runes) of the inner horizontal and vertical edges of the tower
+	var p_hin, p_vin rune
+
+	// The runes of the corner pieces of each tower: top-left, top-right,
+	// bottom-left, bottom-right
+	var corners [4]rune
+
+	// The runes of the midpoints of each tower: top, right, bottom, left
+	var midpoints [4]rune
+
+	// Each style of tower has a different set of input runes
 	switch c.style {
 	case mexican:
 		corners = [4]rune{'╭', '╮', '╰', '╯'}
 		midpoints = [4]rune{'╥', '╡', '╨', '╞'}
-		h = '─'
-		v = '│'
-		h_in = '═'
-		v_in = '║'
+		p_hout = '─'
+		p_vout = '│'
+		p_hin = '═'
+		p_vin = '║'
 	case japanese:
 		corners = [4]rune{'┯', '┯', '┷', '┷'}
 		midpoints = [4]rune{'━', '┤', '━', '├'}
-		h = '━'
-		v = '│'
-		h_in = ' '
-		v_in = ' '
+		p_hout = '━'
+		p_vout = '│'
+		p_hin = ' '
+		p_vin = ' '
 	case american:
 		corners = [4]rune{'╒', '╕', '╘', '╛'}
 		midpoints = [4]rune{'═', '┃', '═', '┃'}
-		h = '═'
-		v = '┃'
-		h_in = ' '
-		v_in = ' '
+		p_hout = '═'
+		p_vout = '┃'
+		p_hin = ' '
+		p_vin = ' '
 	case w_euro:
 		square := '\u25fb'
 		corners = [4]rune{square, square, square, square}
 		midpoints = [4]rune{square, '┇', square, '┇'}
-		h = '╍'
-		v = '┇'
-		h_in = ' '
-		v_in = ' '
+		p_hout = '╍'
+		p_vout = '┇'
+		p_hin = ' '
+		p_vin = ' '
 	}
 
-	switch c.size {
-	case small:
-		towerHeight = 3
-		towerWidth = 5
-	case large:
-		towerHeight = 5
-		towerWidth = 9
-	case enormous:
-		towerHeight = 7
-		towerWidth = 13
-	}
+	// Building a string representation of the tower
+	var t_line string
+	var t_lines []string
 
-	num_others := towerWidth - 2 - 1 // minus two for corners, minus one for midpoint
-
-	var tower [][]rune
-	var t_line []rune
-
-	for i_v := towerHeight; i_v >= 1; i_v-- {
+	for row := v_count; row >= 1; row-- {
 		var left_edge, right_edge, mid, others rune
 
-		switch i_v {
-		case towerHeight: // top
+		switch row {
+
+		// first row
+		case v_count:
 			left_edge = corners[0]
 			right_edge = corners[1]
-			others = h
+			others = p_hout
 			mid = midpoints[0]
-		case 1: // bottom
+
+		// last row
+		case 1:
 			left_edge = corners[2]
 			right_edge = corners[3]
-			others = h
+			others = p_hout
 			mid = midpoints[2]
-		case towerHeight/2 + 1: // middle
+
+		// middle row
+		case v_count/2 + 1:
 			left_edge = midpoints[3]
 			right_edge = midpoints[1]
-			others = h_in
-			mid = ' ' //TODO
-		default: // others
-			left_edge = v
-			right_edge = v
+			others = p_hin
+			mid = ' ' //TODO: put things in towers
+
+		default:
+			left_edge = p_vout
+			right_edge = p_vout
 			others = ' '
-			mid = v_in
+			mid = p_vin
+
 		}
 
-		t_line = []rune{left_edge}
+		// Put the pieces together for each row
+		t_line = string(left_edge)
+		t_line += strings.Repeat(string(others), o_count)
+		t_line += string(mid)
+		t_line += strings.Repeat(string(others), o_count)
+		t_line += string(right_edge)
 
-		for i := num_others / 2; i > 0; i-- {
-			t_line = append(t_line, others)
-		}
-
-		t_line = append(t_line, mid)
-
-		for i := num_others / 2; i > 0; i-- {
-			t_line = append(t_line, others)
-		}
-
-		t_line = append(t_line, right_edge)
-
-		tower = append(tower, t_line)
+		// Put the current row's combined pieces in a list of rows
+		t_lines = append(t_lines, t_line)
 	}
 
-	var s string
-	for _, t := range tower {
-		s += string(t) + "\n"
+	return strings.Join(t_lines, "\n")
+}
+
+// castle.towerDims determines the dimensions of the towers of a castle based
+// on its size, which isn't numeric
+func (c castle) towerDims() (h_count, v_count int) {
+	switch c.size {
+	case small:
+		v_count = 3
+		h_count = 5
+	case large:
+		v_count = 5
+		h_count = 9
+	case enormous:
+		v_count = 7
+		h_count = 13
 	}
-	return s
+
+	return
+}
+
+func (c castle) wallDims() (h_count, v_count int) {
+	h_count, v_count = c.towerDims()
+
+	h_count *= 3
+	v_count *= 3
+
+	return
+}
+
+func (c castle) dims() (h_count, v_count int) {
+	h_tower, v_tower := c.towerDims()
+	h_wall, v_wall := c.wallDims()
+
+	h_count = h_tower*2 + h_wall
+	v_count = v_tower*2 + v_wall
+
+	return
+}
+
+// castle.String builds a string representation of the entire castle, towers,
+// walls, etc. all included.
+func (c castle) String() string {
+
+	// Different sizes of castle have different length walls
+	h_count, v_count := c.wallDims()
+
+	// Space between inner and outer walls
+	h_tower, v_tower := c.towerDims()
+
+	// Get rid of the tower edges to make space between walls
+	h_spaceBetween := h_tower - 2
+	v_spaceBetween := v_tower - 2
+
+	// Horizontal and vertical "pieces" (runes) of the wall
+	var p_v, p_h rune
+
+	// Each wall thickness has its own mini-style
+	switch c.thickness {
+	case thick:
+		p_v = '┃'
+		p_h = '━'
+	case double:
+		p_v = '║'
+		p_h = '═'
+	case dashed:
+		p_v = '┇'
+		p_h = '╍'
+	case thin:
+		p_v = '│'
+		p_h = '─'
+	case broken:
+		p_v = '╵'
+		p_h = '╴'
+	}
+
+	/*
+		// But all gates look the same
+		p_gate_v := rune('⸬')
+		p_gate_h := rune('⸬')
+	*/
+
+	lines_tower := strings.Split(c.towerString(), "\n")
+
+	// Copy lines_tower to a new slice `lines`, but add enough rows to fit the
+	// whole castle
+	_, castleLines := c.dims()
+	lines := make([]string, castleLines)
+	for i := 0; i < len(lines_tower); i++ {
+		lines[i] = lines_tower[i]
+	}
+
+	// Begin to construct each row
+	row := 0
+
+	// Add the outer north horizontal wall
+	lines[row] += strings.Repeat(string(p_h), h_count)
+
+	// Add the first piece of the right tower
+	lines[row] += lines_tower[row]
+
+	// Add space and pieces of the right tower until the last row of the north
+	// wall
+	last := row + v_spaceBetween + 1
+	for row += 1; row < last; row++ {
+
+		// Add space
+		lines[row] += strings.Repeat(" ", h_count)
+
+		// Add row of right tower
+		lines[row] += lines_tower[row]
+	}
+
+	// Add the inner north horizontal wall
+	lines[row] += strings.Repeat(string(p_h), h_count)
+
+	// Add the last piece of the right tower
+	lines[row] += lines_tower[row]
+
+	// Add vertical walls on both sides, with space between
+	last = row + v_count + 1
+	for row += 1; row < last; row++ {
+
+		// west wall: outside, space, inside
+		lines[row] = string(p_v)
+		lines[row] += strings.Repeat(" ", h_spaceBetween)
+		lines[row] += string(p_v)
+
+		// inside of castle
+		lines[row] += strings.Repeat(" ", h_count)
+
+		// east wall: outside, space, inside
+		lines[row] += string(p_v)
+		lines[row] += strings.Repeat(" ", h_spaceBetween)
+		lines[row] += string(p_v)
+	}
+
+	towerStart := row
+
+	// Add top row of bottom left tower
+	lines[row] = lines_tower[row-towerStart]
+
+	// Add the inner south horizontal wall
+	lines[row] += strings.Repeat(string(p_h), h_count)
+
+	// Add the first piece of the bottom right tower
+	lines[row] = lines_tower[row-towerStart]
+
+	// Make new rows of left tower + space + right tower until the last row of
+	// the castle
+	last = row + v_spaceBetween + 1
+	for row += 1; row < last; row++ {
+		lines[row] = lines_tower[row-towerStart]
+		lines[row] += strings.Repeat(" ", h_count)
+		lines[row] += lines_tower[row-towerStart]
+	}
+
+	// Add last row of left tower
+	lines[row] = lines_tower[row-towerStart]
+
+	// Add outer south horizontal wall
+	lines[row] += strings.Repeat(string(p_h), h_count)
+
+	// Add last row of right tower
+	lines[row] += lines_tower[row-towerStart]
+
+	return strings.Join(lines, "\n")
+
 }
 
 func main() {
@@ -179,8 +361,8 @@ func main() {
 					military,
 					arts,
 				},
-				gates:  []cardinal{east},
-				weight: thin,
+				gates:     []cardinal{east},
+				thickness: thin,
 			}
 			fmt.Printf(c.String())
 		}
