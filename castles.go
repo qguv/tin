@@ -215,8 +215,8 @@ func (c castle) String() string {
 	h_tower, v_tower := c.towerDims()
 
 	// Determine gap between tower edge and wall
-	h_spaceOutside := (h_tower - 5) / 2
-	v_spaceOutside := (v_tower - 3) / 2
+	h_spaceOutside := (h_tower - 5) / 4
+	v_spaceOutside := (v_tower - 1) / 4
 
 	// Determine space between walls
 	h_spaceBetween := h_tower - h_spaceOutside*2 - 2
@@ -341,7 +341,7 @@ func (c castle) String() string {
 
 func main() {
 	var c castle
-	sizes := []castle_size{small, large}
+	sizes := []castle_size{small, large, enormous}
 	styles := []castle_style{w_euro, japanese, mexican, american}
 	for _, style := range styles {
 		for _, size := range sizes {
