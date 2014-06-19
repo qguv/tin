@@ -65,17 +65,7 @@ func (c castle) towerString() string {
 	var v_count, h_count int
 
 	// Different sizes of castle have different sized towers
-	switch c.size {
-	case small:
-		v_count = 3
-		h_count = 5
-	case large:
-		v_count = 5
-		h_count = 9
-	case enormous:
-		v_count = 7
-		h_count = 13
-	}
+	h_count, v_count = c.towerDims()
 
 	// Amount of non-edge, non-midpoint pieces in each row. Defined as the
 	// tower's width minus two for edges minus one for the midpoint
@@ -167,9 +157,9 @@ func (c castle) towerString() string {
 
 		// Put the pieces together for each row
 		t_line = string(left_edge)
-		t_line += strings.Repeat(string(others), o_count)
+		t_line += strings.Repeat(string(others), o_count/2)
 		t_line += string(mid)
-		t_line += strings.Repeat(string(others), o_count)
+		t_line += strings.Repeat(string(others), o_count/2)
 		t_line += string(right_edge)
 
 		// Put the current row's combined pieces in a list of rows
@@ -220,14 +210,23 @@ func (c castle) dims() (h_count, v_count int) {
 // walls, etc. all included.
 func (c castle) String() string {
 
-	// Different sizes of castle have different length walls
+	// Different sizes of castle have different length walls and towers
 	h_count, v_count := c.wallDims()
-
-	// Space between inner and outer walls
 	h_tower, v_tower := c.towerDims()
 
-	// Get rid of the tower edges to make space between walls
-	h_spaceBetween := h_tower - 2
+	// Determine gap between tower edge and wall
+	h_spaceOutside := (h_tower - 5) / 2
+
+	// for now, we need to ignore vertical space outside. the dynamic change
+	// ain't trivial.
+	//v_spaceOutside := (v_tower - 3) / 2
+
+	// Determine space between walls
+	h_spaceBetween := h_tower - h_spaceOutside*2 - 2
+
+	// for now, we need to fix vertical space between. the dynamic change ain't
+	// trivial.
+	//v_spaceBetween := v_tower - v_spaceOutside * 2 - 2
 	v_spaceBetween := v_tower - 2
 
 	// Horizontal and vertical "pieces" (runes) of the wall
@@ -287,6 +286,7 @@ func (c castle) String() string {
 
 		// Add row of right tower
 		lines[row] += lines_tower[row]
+
 	}
 
 	// Add the inner north horizontal wall
@@ -299,18 +299,23 @@ func (c castle) String() string {
 	last = row + v_count + 1
 	for row += 1; row < last; row++ {
 
-		// west wall: outside, space, inside
-		lines[row] = string(p_v)
+		// west wall: outsideSpace, outside, insideSpace, inside, outsideSpace
+		lines[row] = strings.Repeat(" ", h_spaceOutside)
+		lines[row] += string(p_v)
 		lines[row] += strings.Repeat(" ", h_spaceBetween)
 		lines[row] += string(p_v)
+		lines[row] += strings.Repeat(" ", h_spaceOutside)
 
 		// inside of castle
 		lines[row] += strings.Repeat(" ", h_count)
 
-		// east wall: outside, space, inside
+		// east wall: outsideSpace, outside, space, inside, outsideSpace
+		lines[row] += strings.Repeat(" ", h_spaceOutside)
 		lines[row] += string(p_v)
 		lines[row] += strings.Repeat(" ", h_spaceBetween)
 		lines[row] += string(p_v)
+		lines[row] += strings.Repeat(" ", h_spaceOutside)
+
 	}
 
 	towerStart := row
@@ -321,8 +326,8 @@ func (c castle) String() string {
 	// Add the inner south horizontal wall
 	lines[row] += strings.Repeat(string(p_h), h_count)
 
-	// Add the first piece of the bottom right tower
-	lines[row] = lines_tower[row-towerStart]
+	// Add the top row of the bottom right tower
+	lines[row] += lines_tower[row-towerStart]
 
 	// Make new rows of left tower + space + right tower until the last row of
 	// the castle
@@ -331,6 +336,7 @@ func (c castle) String() string {
 		lines[row] = lines_tower[row-towerStart]
 		lines[row] += strings.Repeat(" ", h_count)
 		lines[row] += lines_tower[row-towerStart]
+
 	}
 
 	// Add last row of left tower
@@ -364,7 +370,7 @@ func main() {
 				gates:     []cardinal{east},
 				thickness: thin,
 			}
-			fmt.Printf(c.String())
+			fmt.Println(c.String())
 		}
 	}
 }
