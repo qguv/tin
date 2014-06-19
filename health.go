@@ -8,8 +8,6 @@ type bodyPart int
 const (
 	head = iota
 	chest
-	stomach
-	back
 	rArm
 	lArm
 	rHand
@@ -59,13 +57,11 @@ func newPersonHealth() health {
 var (
 	movementCrucial = []bodyPart{
 		head,
-		back,
 		rLeg,
 		lLeg,
 		lFoot,
 		rFoot,
 		chest,
-		stomach,
 	}
 )
 
