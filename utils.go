@@ -8,3 +8,7 @@ func contains(list []interface{}, elem interface{}) bool {
 	}
 	return false
 }
+
+func intRoundDiv(num int, divisor int) int {
+	return int((float32(num) / float32(divisor)) + .5)
+}
