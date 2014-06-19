@@ -37,7 +37,77 @@ type attackable interface {
 	defend()
 }
 
-func (p *person) hit(t *person, bp bodyPart, contact int) {
+func (b *bodyPart) getAccNeeded() int {
+	switch *b {
+	case head:
+		return 70
+	case lArm:
+		return 80
+	case rArm:
+		return 80
+	case lLeg:
+		return 80
+	case rLeg:
+		return 80
+	case chest:
+		return 50
+	default:
+		return 90
+
+	}
+}
+
+func (p *person) attack(t *person, bp bodyPart) {
+	accuracy := p.rollAccuracy(t, bp)
+
+	var contact int
+
+	if accuracy >= 0 {
+		if accuracy >= 20 {
+			contact = 100
+		} else {
+			contact = int(float32(accuracy)/20*100 + .5)
+		}
+	} else {
+		if accuracy >= -20 {
+			bp = bodyPart(rand.Int31n(numBodyParts - 1))
+			contact = int(rand.Int31n(50))
+		} else {
+			contact = 0
+		}
+
+	}
+
+	contact += 0
+	// TODO left off here, need to do the damage
+
+}
+
+func (p *person) rollAccuracy(t *person, bp bodyPart) int {
+
+	accuracy := p.getWeaponSkill() + p.accuracy + p.agility
+
+	// apply target dodge attempt
+	dodge := calcDamageRatio(t.agility,
+		intRoundDiv((int(t.movementCapacity())+t.agility), 2))
+
+	if dodge >= accuracy {
+		accuracy = 0
+	} else {
+		accuracy -= dodge
+	}
+
+	accuracy = calcDamageRatio(accuracy,
+		intRoundDiv(p.health.stamina+int(p.movementCapacity()), 2))
+
+	need := bp.getAccNeeded()
+
+	need -= int(float32(accuracy)/30*50 + .5)
+
+	roll := rand.Int31n(100)
+
+	return int(roll) - need
+
 }
 
 func (b *bodyPartInstance) takeDamage(blunt int, cut int) {
@@ -46,6 +116,9 @@ func (b *bodyPartInstance) takeDamage(blunt int, cut int) {
 	}
 	if cut >= 30 {
 		b.severed = true
+	}
+	if cut+blunt >= 50 {
+		b.detached = true
 	}
 	if b.health <= cut+blunt {
 		b.health = 0
