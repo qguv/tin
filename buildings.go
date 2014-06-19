@@ -216,18 +216,11 @@ func (c castle) String() string {
 
 	// Determine gap between tower edge and wall
 	h_spaceOutside := (h_tower - 5) / 2
-
-	// for now, we need to ignore vertical space outside. the dynamic change
-	// ain't trivial.
-	//v_spaceOutside := (v_tower - 3) / 2
+	v_spaceOutside := (v_tower - 3) / 2
 
 	// Determine space between walls
 	h_spaceBetween := h_tower - h_spaceOutside*2 - 2
-
-	// for now, we need to fix vertical space between. the dynamic change ain't
-	// trivial.
-	//v_spaceBetween := v_tower - v_spaceOutside * 2 - 2
-	v_spaceBetween := v_tower - 2
+	//v_spaceBetween := v_tower - v_spaceOutside*2 - 2
 
 	// Horizontal and vertical "pieces" (runes) of the wall
 	var p_v, p_h rune
@@ -270,34 +263,32 @@ func (c castle) String() string {
 	// Begin to construct each row
 	row := 0
 
-	// Add the outer north horizontal wall
-	lines[row] += strings.Repeat(string(p_h), h_count)
+	// Construct top towers and north walls
+	first := row
+	last := row + v_tower
+	for ; row < last; row++ {
 
-	// Add the first piece of the right tower
-	lines[row] += lines_tower[row]
+		// determine whether to add wall or space
+		var s string
 
-	// Add space and pieces of the right tower until the last row of the north
-	// wall
-	last := row + v_spaceBetween + 1
-	for row += 1; row < last; row++ {
+		if row-first == v_spaceOutside || last-row-1 == v_spaceOutside {
+			// we're on top of the wall
+			s = string(p_h)
+		} else {
+			// we're either outside or inside the wall
+			s = " "
+		}
 
-		// Add space
-		lines[row] += strings.Repeat(" ", h_count)
+		// Add wall or space
+		lines[row] += strings.Repeat(s, h_count)
 
-		// Add row of right tower
-		lines[row] += lines_tower[row]
-
+		// Add a line of right tower
+		lines[row] += lines_tower[row-first]
 	}
 
-	// Add the inner north horizontal wall
-	lines[row] += strings.Repeat(string(p_h), h_count)
-
-	// Add the last piece of the right tower
-	lines[row] += lines_tower[row]
-
 	// Add vertical walls on both sides, with space between
-	last = row + v_count + 1
-	for row += 1; row < last; row++ {
+	last = row + v_count
+	for ; row < last; row++ {
 
 		// west wall: outsideSpace, outside, insideSpace, inside, outsideSpace
 		lines[row] = strings.Repeat(" ", h_spaceOutside)
@@ -318,35 +309,31 @@ func (c castle) String() string {
 
 	}
 
-	towerStart := row
+	// Construct bottom towers and south walls
+	first = row
+	last = row + v_tower
+	for ; row < last; row++ {
 
-	// Add top row of bottom left tower
-	lines[row] = lines_tower[row-towerStart]
+		// Add a line of left tower
+		lines[row] = lines_tower[row-first]
 
-	// Add the inner south horizontal wall
-	lines[row] += strings.Repeat(string(p_h), h_count)
+		// determine whether to add wall or space
+		var s string
 
-	// Add the top row of the bottom right tower
-	lines[row] += lines_tower[row-towerStart]
+		if row-first == v_spaceOutside || last-row-1 == v_spaceOutside {
+			// we're on top of the wall
+			s = string(p_h)
+		} else {
+			// we're either outside or inside the wall
+			s = " "
+		}
 
-	// Make new rows of left tower + space + right tower until the last row of
-	// the castle
-	last = row + v_spaceBetween + 1
-	for row += 1; row < last; row++ {
-		lines[row] = lines_tower[row-towerStart]
-		lines[row] += strings.Repeat(" ", h_count)
-		lines[row] += lines_tower[row-towerStart]
+		// Add wall or space
+		lines[row] += strings.Repeat(s, h_count)
 
+		// Add a line of right tower
+		lines[row] += lines_tower[row-first]
 	}
-
-	// Add last row of left tower
-	lines[row] = lines_tower[row-towerStart]
-
-	// Add outer south horizontal wall
-	lines[row] += strings.Repeat(string(p_h), h_count)
-
-	// Add last row of right tower
-	lines[row] += lines_tower[row-towerStart]
 
 	return strings.Join(lines, "\n")
 
