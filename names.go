@@ -113,7 +113,7 @@ func (n name) String(r *rand.Rand) (s string) {
 				s += standard[i_standard]
 			}
 
-			if r.Intn(2) == 0 {
+			if r.Intn(3) == 0 {
 				s += "n"
 			}
 		}
