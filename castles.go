@@ -32,12 +32,12 @@ const (
 type castle_workshop rune
 
 const (
-	alchemy  = '⚗'      // alembic
-	military = '⚔'      // crossed swords
-	economy  = '⊚'      // coin
-	industry = '⚒'      // mallet and pick
-	intrigue = "\u2709" // a sealed letter
-	arts     = '♪'      // some artsy doilie
+	alchemy  castle_workshop = '⚗'      // alembic
+	military castle_workshop = '⚔'      // crossed swords
+	economy  castle_workshop = '⊚'      // coin
+	industry castle_workshop = '⚒'      // mallet and pick
+	intrigue castle_workshop = "\u2709" // a sealed letter
+	arts     castle_workshop = '♪'      // some artsy doilie
 )
 
 type wall_thickness uint8
