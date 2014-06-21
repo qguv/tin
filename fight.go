@@ -37,6 +37,8 @@ type attackable interface {
 	defend()
 }
 
+// getAccNeeded returns the base roll needed to hit
+// a given target area
 func (b *bodyPart) getAccNeeded() int {
 	switch *b {
 	case head:
@@ -57,9 +59,12 @@ func (b *bodyPart) getAccNeeded() int {
 	}
 }
 
+// attack causes a character to attempt to hit the target area
+// with current equiped weapon, opponent will attempt to dodge
 func (p *person) attack(t *person, bp bodyPart) {
 	accuracy := p.rollAccuracy(t, bp)
 
+	// fmt.Printf("Accuracy = %d\n", accuracy)
 	var contact int
 
 	if accuracy >= 0 {
@@ -78,11 +83,29 @@ func (p *person) attack(t *person, bp bodyPart) {
 
 	}
 
-	contact += 0
-	// TODO left off here, need to do the damage
+	damage := p.rollDamage()
+	// fmt.Printf("Damage = %d\n", damage)
+
+	damage = calcDamageRatio(damage, contact)
+	// fmt.Printf("After contact = %d\n", damage)
+
+	target := t.getBodyPart(bp)
+	// fmt.Println(target)
+	target.takeAttack(damage, p.equiped.weapon.bluntness, p.equiped.weapon.sharpness)
 
 }
 
+// rollDamage returns the damage dealt by an attack
+func (p *person) rollDamage() int {
+	max := p.equiped.weapon.maxDamage + p.strength + p.getWeaponSkill()
+
+	roll := rand.Int31n(int32(max) - int32(p.equiped.weapon.minDamage))
+
+	return int(roll) + p.equiped.weapon.minDamage
+}
+
+// rollAccuracy returns the differance between roll and needed to hit
+// IE, -10 means 10 short of scoring a hit
 func (p *person) rollAccuracy(t *person, bp bodyPart) int {
 
 	accuracy := p.getWeaponSkill() + p.accuracy + p.agility
@@ -110,6 +133,23 @@ func (p *person) rollAccuracy(t *person, bp bodyPart) int {
 
 }
 
+// takeAttack causes a bodyPartInstance to receive an attack
+// if the bodyPart has armor equiped, it is used to block
+func (b *bodyPartInstance) takeAttack(damage int, blunt int, cut int) {
+
+	// fmt.Println(b)
+	if b.armor != nil {
+		// fmt.Println("has armor")
+		blunt, cut = b.armor.takeDamage(damage, blunt, cut)
+	}
+
+	// fmt.Println("taking damage")
+	b.takeDamage(blunt, cut)
+
+}
+
+// takeDamage causes a body part to take the indicated amount of damage
+// this method applies status effects based on damage
 func (b *bodyPartInstance) takeDamage(blunt int, cut int) {
 	if blunt >= 30 {
 		b.broken = true
@@ -125,17 +165,19 @@ func (b *bodyPartInstance) takeDamage(blunt int, cut int) {
 	} else {
 		b.health -= cut + blunt
 	}
+
 }
 
-func (a *armorEquip) takeDamage(damage int, blunt int, cut int) {
+// takeDamage calculates the damage that penetrates armor
+// it also handles loss of armor durabillity
+// TODO handle loss of weapon durabillity
+func (a *armorEquip) takeDamage(damage int, blunt int, cut int) (int, int) {
 
 	bluntTransfered := calcDamageRatio(damage, blunt)
 	cutTransfered := calcDamageRatio(damage, cut)
 
 	bluntDamage := bluntTransfered - calcDamageRatio(bluntTransfered, a.getDampening())
 	cutDamage := cutTransfered - calcDamageRatio(cutTransfered, a.getHardness())
-
-	a.equipedOn.takeDamage(bluntDamage, cutDamage)
 
 	armorDamage := damage - calcDamageRatio(damage, a.strength)
 
@@ -144,8 +186,11 @@ func (a *armorEquip) takeDamage(damage int, blunt int, cut int) {
 	} else {
 		a.durability -= armorDamage
 	}
+
+	return bluntDamage, cutDamage
 }
 
+// TODO change this name
 func calcDamageRatio(damage int, ratio int) int {
 
 	damage = int(float32(damage)*(float32(ratio)/100.0) + .5)

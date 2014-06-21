@@ -13,6 +13,7 @@ const (
 	adamantine
 )
 
+// getStrength returns a materials strenght
 func (m *material) getStrenght() int {
 	switch *m {
 	case wood:
@@ -124,7 +125,6 @@ type weaponEquip struct {
 type armorEquip struct {
 	equipment
 	armor     armor
-	equipedOn *bodyPartInstance
 	strength  int
 	hardness  int
 	dampening int

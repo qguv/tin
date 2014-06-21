@@ -22,12 +22,24 @@ const (
 // bodyPartInstance is an instance of a body part with status.
 type bodyPartInstance struct {
 	bodyPart bodyPart
+	armor    *armorEquip
 	// out of 100
 	health   int
 	broken   bool
 	detached bool
 	infected bool
 	severed  bool
+}
+
+// getBodyPart returns a corresponding bodyPartInstance
+// given a bodyPart
+func (h *health) getBodyPart(bp bodyPart) *bodyPartInstance {
+	for index := 0; index < len(h.bodyParts); index++ {
+		if h.bodyParts[index].bodyPart == bp {
+			return &h.bodyParts[index]
+		}
+	}
+	return nil
 }
 
 // health represents a characters health status.

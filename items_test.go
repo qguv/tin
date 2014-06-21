@@ -3,14 +3,9 @@ package main
 import "testing"
 
 func TestArmorEquip(t *testing.T) {
-	chest := bodyPartInstance{
-		bodyPart: chest,
-		health:   100,
-	}
 	test := armorEquip{
 		equipment: equipment{durability: 100},
 		armor:     chestplate,
-		equipedOn: &chest,
 		strength:  90,
 		hardness:  75,
 		dampening: 75,

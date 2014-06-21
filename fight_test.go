@@ -6,17 +6,17 @@ import (
 )
 
 func TestTakeDamage(t *testing.T) {
-	chest := bodyPartInstance{
-		bodyPart: chest,
-		health:   100,
-	}
 	test := armorEquip{
 		equipment: equipment{durability: 100},
 		armor:     chestplate,
-		equipedOn: &chest,
 		strength:  80,
 		hardness:  75,
 		dampening: 50,
+	}
+	chest := bodyPartInstance{
+		armor:    &test,
+		bodyPart: chest,
+		health:   100,
 	}
 
 	fmt.Println(test)
@@ -25,12 +25,43 @@ func TestTakeDamage(t *testing.T) {
 	count := 0
 
 	for chest.health > 0 {
-		test.takeDamage(75, 75, 15)
+		chest.takeAttack(75, 75, 15)
 		fmt.Println(test)
 		fmt.Println(chest)
 		count++
 	}
 
 	fmt.Println(count)
+
+}
+
+func TestTakeAttack(t *testing.T) {
+	attacker := randPerson()
+	defender := randPerson()
+
+	armor := armorEquip{
+		equipment: equipment{durability: 100},
+		armor:     chestplate,
+		strength:  80,
+		hardness:  75,
+		dampening: 50,
+	}
+
+	weapon := weaponEquip{
+		equipment: equipment{durability: 100},
+		minDamage: 15,
+		maxDamage: 30,
+		sharpness: 50,
+		bluntness: 25,
+	}
+
+	defender.getBodyPart(chest).armor = &armor
+	attacker.equiped.weapon = weapon
+
+	for defender.getBodyPart(chest).health > 0 {
+		attacker.attack(&defender, chest)
+		fmt.Println(defender.getBodyPart(chest))
+
+	}
 
 }
