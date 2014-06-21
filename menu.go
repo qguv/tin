@@ -24,18 +24,32 @@ func tbcenter(fg, bg termbox.Attribute, msg string) {
 	tbprint(lpad, midh, fg, bg, msg)
 }
 
-func drawTinLogo() {
+func drawTinLogo(offset bool) {
 	tbph := func(m string, h int) {
 		tbcenterwidth(h, termbox.ColorWhite, termbox.ColorDefault, m)
 	}
 	_, h := termbox.Size()
 	midh := h/2 - 1
 
-	tbph("✰ ✰ ✰ ✰ ✰", midh-2)
+	var top, bottom string
+	if offset {
+		top += " "
+	} else {
+		bottom += " "
+	}
+
+	tbph(top+"✰ ✰ ✰ ✰ ✰", midh-2)
 	tbph(" T.I.N.! ", midh)
-	tbph("✰ ✰ ✰ ✰ ✰", midh+2)
+	tbph(bottom+"✰ ✰ ✰ ✰ ✰", midh+2)
 
 	tbph("(ESC exits)", h-1)
+}
+
+func checkBoolChan(c chan bool) bool {
+	b := <-c
+	c <- b
+
+	return b
 }
 
 func runGameLoop() {
@@ -45,8 +59,6 @@ func runGameLoop() {
 	}
 	defer termbox.Close()
 
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-
 	event_queue := make(chan termbox.Event)
 	go func() {
 		for {
@@ -54,13 +66,26 @@ func runGameLoop() {
 		}
 	}()
 
-	drawTinLogo()
+	offset_chan := make(chan bool, 1)
+	offset_chan <- false
+	go func() {
+		for {
+			b := <-offset_chan
+			offset_chan <- !b
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	drawTinLogo(checkBoolChan(offset_chan))
+	termbox.Flush()
 
 gameLoop:
 	for {
 		select {
 		case ev := <-event_queue:
-			if ev.Type == termbox.EventKey {
+			switch ev.Type {
+			case termbox.EventKey:
 				switch ev.Key {
 				case termbox.KeyEsc:
 					break gameLoop
@@ -69,6 +94,8 @@ gameLoop:
 				}
 			}
 		default:
+			termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+			drawTinLogo(checkBoolChan(offset_chan))
 			termbox.Flush()
 			time.Sleep(10 * time.Millisecond)
 		}
