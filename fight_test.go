@@ -48,8 +48,12 @@ func TestAttackBodyPart(t *testing.T) {
 	}
 
 	weapon := weaponEquip{
-		equipment: equipment{durability: 100},
+		equipment: equipment{
+			durability: 100,
+			owner:      &attacker,
+		},
 		weapon:    sword,
+		strength:  75,
 		minDamage: 15,
 		maxDamage: 30,
 		sharpness: 50,
@@ -60,7 +64,7 @@ func TestAttackBodyPart(t *testing.T) {
 	attacker.equipped.weapon = weapon
 
 	for defender.getBodyPart(chest).health > 0 {
-		attacker.attack(&defender, chest)
+		attacker.attackBodyPart(&defender, chest)
 		fmt.Println(defender.getBodyPart(chest))
 
 	}

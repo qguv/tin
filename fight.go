@@ -64,7 +64,7 @@ func (b *bodyPart) getAccNeeded() int {
 
 // attack causes a character to attempt to hit the target area
 // with current equipped weapon, opponent will attempt to dodge
-func (p *person) attack(t *person, bp bodyPart) {
+func (p *person) attackBodyPart(t *person, bp bodyPart) {
 	accuracy := p.rollAccuracy(t, bp)
 
 	// fmt.Printf("Accuracy = %d\n", accuracy)
@@ -95,6 +95,9 @@ func (p *person) attack(t *person, bp bodyPart) {
 	target := t.getBodyPart(bp)
 	// fmt.Println(target)
 	target.takeAttack(damage, p.getWeaponBluntness(), p.getWeaponSharpness())
+
+	// reduce weapon durability
+	p.equipped.weapon.reduceDurability(damage, *t.getBodyPart(bp))
 
 }
 
@@ -151,6 +154,9 @@ func (b *bodyPartInstance) takeAttack(damage int, blunt int, cut int) {
 	if b.armor != nil {
 		// fmt.Println("has armor")
 		blunt, cut = b.armor.takeDamage(damage, blunt, cut)
+	} else {
+		blunt = calcDamageRatio(damage, blunt)
+		cut = calcDamageRatio(damage, cut)
 	}
 
 	// fmt.Println("taking damage")

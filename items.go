@@ -116,25 +116,68 @@ type toolEquip struct {
 type weaponEquip struct {
 	equipment
 	weapon    weapon
+	strength  int
 	minDamage int
 	maxDamage int
 	sharpness int
 	bluntness int
 }
 
-func (w *equipped) getWeaponBluntness() int {
-	if w.weapon.weapon == fist {
-		return 100
-	} else {
-		return w.weapon.bluntness
+func (w *weaponEquip) dequip() {
+	w.getOwner().equipped.weapon = weaponEquip{
+		equipment: equipment{owner: w.getOwner()},
 	}
+}
+func (w *weaponEquip) reduceDurability(damage int, bp bodyPartInstance) {
+
+	const minRedux int = 5
+
+	var redux int
+	armor := bp.armor
+
+	blunt := calcDamageRatio(damage, w.getWeaponBluntness())
+	cut := calcDamageRatio(damage, w.getWeaponSharpness())
+
+	if armor != nil {
+		tblunt, tcut := armor.takeDamage(damage, w.getWeaponBluntness(), w.getWeaponSharpness())
+		blocked := blunt - tblunt + cut - tcut
+		redux = calcDamageRatio(blocked, 100-w.strength)
+	}
+
+	if redux < minRedux {
+		redux = minRedux
+	}
+
+	if w.durability-redux <= 0 {
+		w.durability = 0
+		w.dequip()
+	} else {
+		w.durability -= redux
+	}
+
+}
+
+func (w *equipped) getWeaponBluntness() int {
+	return w.weapon.getWeaponBluntness()
 }
 
 func (w *equipped) getWeaponSharpness() int {
-	if w.weapon.weapon == fist {
+	return w.weapon.getWeaponBluntness()
+}
+
+func (w *weaponEquip) getWeaponBluntness() int {
+	if w.weapon == fist {
+		return 100
+	} else {
+		return w.bluntness
+	}
+}
+
+func (w *weaponEquip) getWeaponSharpness() int {
+	if w.weapon == fist {
 		return 0
 	} else {
-		return w.weapon.sharpness
+		return w.sharpness
 	}
 }
 
