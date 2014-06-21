@@ -15,10 +15,10 @@ const (
 type castle_style uint8
 
 const (
-	japanese castle_style = iota
-	w_euro                // western european, e.g. German, French
-	american              // our unique style of old-world architecture
-	mexican               // mayan/aztec step designs
+	japanese_style castle_style = iota
+	wEuro_style                 // western european, e.g. German, French
+	american_style              // our unique style of old-world architecture
+	mexican_style               // mayan/aztec step designs
 )
 
 type castle_size uint8
@@ -36,7 +36,7 @@ const (
 	military castle_workshop = '⚔'      // crossed swords
 	economy  castle_workshop = '⊚'      // coin
 	industry castle_workshop = '⚒'      // mallet and pick
-	intrigue castle_workshop = "\u2709" // a sealed letter
+	intrigue castle_workshop = '\u2709' // a sealed letter
 	arts     castle_workshop = '♪'      // some artsy doilie
 )
 
@@ -86,28 +86,28 @@ func (c castle) towerString() string {
 
 	// Each style of tower has a different set of input runes
 	switch c.style {
-	case mexican:
+	case mexican_style:
 		corners = [4]rune{'╭', '╮', '╰', '╯'}
 		midpoints = [4]rune{'╥', '╡', '╨', '╞'}
 		p_hout = '─'
 		p_vout = '│'
 		p_hin = '═'
 		p_vin = '║'
-	case japanese:
+	case japanese_style:
 		corners = [4]rune{'┯', '┯', '┷', '┷'}
 		midpoints = [4]rune{'━', '┤', '━', '├'}
 		p_hout = '━'
 		p_vout = '│'
 		p_hin = ' '
 		p_vin = ' '
-	case american:
+	case american_style:
 		corners = [4]rune{'╒', '╕', '╘', '╛'}
 		midpoints = [4]rune{'═', '┃', '═', '┃'}
 		p_hout = '═'
 		p_vout = '┃'
 		p_hin = ' '
 		p_vin = ' '
-	case w_euro:
+	case wEuro_style:
 		square := '\u25fb'
 		corners = [4]rune{square, square, square, square}
 		midpoints = [4]rune{square, '┇', square, '┇'}
@@ -342,7 +342,7 @@ func (c castle) String() string {
 func main() {
 	var c castle
 	sizes := []castle_size{small, large, enormous}
-	styles := []castle_style{w_euro, japanese, mexican, american}
+	styles := []castle_style{wEuro_style, japanese_style, mexican_style, american_style}
 	for _, style := range styles {
 		for _, size := range sizes {
 			c = castle{
