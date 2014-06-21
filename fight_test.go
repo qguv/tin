@@ -35,7 +35,7 @@ func TestTakeDamage(t *testing.T) {
 
 }
 
-func TestTakeAttack(t *testing.T) {
+func TestAttackBodyPart(t *testing.T) {
 	attacker := randPerson()
 	defender := randPerson()
 
@@ -49,6 +49,7 @@ func TestTakeAttack(t *testing.T) {
 
 	weapon := weaponEquip{
 		equipment: equipment{durability: 100},
+		weapon:    sword,
 		minDamage: 15,
 		maxDamage: 30,
 		sharpness: 50,
@@ -56,7 +57,7 @@ func TestTakeAttack(t *testing.T) {
 	}
 
 	defender.getBodyPart(chest).armor = &armor
-	attacker.equiped.weapon = weapon
+	attacker.equipped.weapon = weapon
 
 	for defender.getBodyPart(chest).health > 0 {
 		attacker.attack(&defender, chest)
@@ -64,4 +65,12 @@ func TestTakeAttack(t *testing.T) {
 
 	}
 
+}
+
+func TestGetTarget(t *testing.T) {
+	attacker := randPerson()
+	defender := randPerson()
+
+	target := attacker.chooseTarget(defender)
+	fmt.Println(target)
 }

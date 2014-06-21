@@ -3,7 +3,7 @@ package main
 import "math/rand"
 
 // equiped represents the equipment that a character is wearing / weilding.
-type equiped struct {
+type equipped struct {
 	armor  map[armor]armorEquip
 	weapon weaponEquip
 	tool   toolEquip
@@ -45,7 +45,7 @@ const (
 type person struct {
 	skills
 	attributes
-	equiped
+	equipped
 	health
 	name       string
 	age        int
@@ -61,7 +61,7 @@ type person struct {
 // getWeaponSkill returns the characters skill in using his equipped weapon.
 // returns 0 if nothing equipped.
 func (p *person) getWeaponSkill() int {
-	weapon := p.equiped.weapon.weapon
+	weapon := p.equipped.weapon.weapon
 	return p.skills.weapons[weapon]
 }
 

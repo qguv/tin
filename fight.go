@@ -1,6 +1,9 @@
 package main
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // fight function causes 2 characters to fight.
 // this will need to be expanded for group combat.
@@ -60,7 +63,7 @@ func (b *bodyPart) getAccNeeded() int {
 }
 
 // attack causes a character to attempt to hit the target area
-// with current equiped weapon, opponent will attempt to dodge
+// with current equipped weapon, opponent will attempt to dodge
 func (p *person) attack(t *person, bp bodyPart) {
 	accuracy := p.rollAccuracy(t, bp)
 
@@ -91,17 +94,24 @@ func (p *person) attack(t *person, bp bodyPart) {
 
 	target := t.getBodyPart(bp)
 	// fmt.Println(target)
-	target.takeAttack(damage, p.equiped.weapon.bluntness, p.equiped.weapon.sharpness)
+	target.takeAttack(damage, p.getWeaponBluntness(), p.getWeaponSharpness())
 
 }
 
 // rollDamage returns the damage dealt by an attack
 func (p *person) rollDamage() int {
-	max := p.equiped.weapon.maxDamage + p.strength + p.getWeaponSkill()
+	var max int
 
-	roll := rand.Int31n(int32(max) - int32(p.equiped.weapon.minDamage))
+	if p.equipped.weapon.weapon == fist {
+		max = 5 + p.strength + p.getWeaponSkill()
+	} else {
 
-	return int(roll) + p.equiped.weapon.minDamage
+		max = p.equipped.weapon.maxDamage + p.strength + p.getWeaponSkill()
+	}
+
+	roll := rand.Int31n(int32(max) - int32(p.equipped.weapon.minDamage))
+
+	return int(roll) + p.equipped.weapon.minDamage
 }
 
 // rollAccuracy returns the differance between roll and needed to hit
@@ -134,7 +144,7 @@ func (p *person) rollAccuracy(t *person, bp bodyPart) int {
 }
 
 // takeAttack causes a bodyPartInstance to receive an attack
-// if the bodyPart has armor equiped, it is used to block
+// if the bodyPart has armor equipped, it is used to block
 func (b *bodyPartInstance) takeAttack(damage int, blunt int, cut int) {
 
 	// fmt.Println(b)
@@ -196,4 +206,38 @@ func calcDamageRatio(damage int, ratio int) int {
 	damage = int(float32(damage)*(float32(ratio)/100.0) + .5)
 
 	return damage
+}
+
+func (p *person) chooseTarget(t person) bodyPart {
+	var maxDamage int
+	var maxTarget bodyPart
+
+	wdamage := p.rollDamage()
+	wblunt := p.getWeaponBluntness()
+	wcut := p.getWeaponSharpness()
+
+	var blunt, cut int
+
+	for _, target := range t.bodyParts {
+		if target.armor != nil {
+			blunt, cut = target.armor.takeDamage(wdamage, wblunt, wcut)
+		} else {
+			blunt = wblunt
+			cut = wcut
+		}
+
+		damage := blunt + cut
+		chance := 100 - target.bodyPart.getAccNeeded()
+
+		damage = calcDamageRatio(damage, chance)
+		fmt.Println(damage)
+
+		if damage > maxDamage {
+			maxDamage = damage
+			maxTarget = target.bodyPart
+		}
+
+	}
+
+	return maxTarget
 }

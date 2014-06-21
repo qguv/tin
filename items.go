@@ -39,7 +39,8 @@ func (m *material) getStrenght() int {
 type weapon int
 
 const (
-	knife = iota
+	fist = iota
+	knife
 	sword
 	battleAxe
 	warHammer
@@ -111,7 +112,7 @@ type toolEquip struct {
 	tool tool
 }
 
-// weaonEquip is a weapon instance.
+// weaponEquip is a weapon instance.
 type weaponEquip struct {
 	equipment
 	weapon    weapon
@@ -119,6 +120,22 @@ type weaponEquip struct {
 	maxDamage int
 	sharpness int
 	bluntness int
+}
+
+func (w *equipped) getWeaponBluntness() int {
+	if w.weapon.weapon == fist {
+		return 100
+	} else {
+		return w.weapon.bluntness
+	}
+}
+
+func (w *equipped) getWeaponSharpness() int {
+	if w.weapon.weapon == fist {
+		return 0
+	} else {
+		return w.weapon.sharpness
+	}
 }
 
 // armorEquip is an armor instance.
