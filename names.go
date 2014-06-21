@@ -1,8 +1,6 @@
 package main
 
-import "fmt"
 import "math/rand"
-import "time"
 import "unicode"
 
 type language uint8
@@ -120,35 +118,4 @@ func (n name) String(r *rand.Rand) (s string) {
 	}
 
 	return toTitleCase(s)
-}
-
-func main() {
-	randomSource := rand.NewSource(time.Now().UTC().UnixNano())
-	r := rand.New(randomSource)
-
-	var n name
-
-	n = name{
-		origin: hawaiian,
-		min:    2,
-		max:    5,
-	}
-
-	fmt.Println("Hawaiian:")
-	for i := 0; i < 20; i++ {
-		fmt.Println("\t", n.String(r))
-	}
-
-	fmt.Println()
-
-	n = name{
-		origin: japanese,
-		min:    2,
-		max:    5,
-	}
-
-	fmt.Println("Japanese:")
-	for i := 0; i < 20; i++ {
-		fmt.Println("\t", n.String(r))
-	}
 }
