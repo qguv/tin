@@ -18,10 +18,16 @@ func tbcenterwidth(y int, fg, bg termbox.Attribute, msg string) {
 	tbprint(lpad, y, fg, bg, msg)
 }
 
+func drawCalibrateReminder() {
+	_, h := termbox.Size()
+	tbph("SPACE to calibrate", h-1)
+}
+
+func tbph(m string, h int) {
+	tbcenterwidth(h, termbox.ColorWhite, termbox.ColorDefault, m)
+}
+
 func drawTinLogo() {
-	tbph := func(m string, h int) {
-		tbcenterwidth(h, termbox.ColorWhite, termbox.ColorDefault, m)
-	}
 	_, h := termbox.Size()
 	midh := h / 2
 
@@ -154,6 +160,8 @@ func runGameLoop() {
 	stars := makeStars(20)
 	go advanceStars(stars)
 
+	var calibrate bool
+
 gameLoop:
 	for {
 		select {
@@ -162,16 +170,20 @@ gameLoop:
 			case termbox.EventKey:
 				switch ev.Key {
 				case termbox.KeyEsc:
-					break gameLoop
+					calibrate = false
 				case termbox.KeyCtrlC:
 					break gameLoop
 				case termbox.KeySpace:
-					// do nothing
+					calibrate = true
 				}
 			}
 		default:
 			showStars(stars)
-			drawTinLogo()
+			if calibrate {
+				drawTinLogo()
+			} else {
+				drawCalibrateReminder()
+			}
 			termbox.Flush()
 			time.Sleep(10 * time.Millisecond)
 			termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
