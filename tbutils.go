@@ -27,6 +27,8 @@ func putUserMessage(m string, h int) {
 	putStringCentered(h, termbox.ColorWhite, termbox.ColorDefault, m)
 }
 
+// inKeyGroup tests whether a termbox event's reported key or rune is in a
+// slice of matching keys or runes.
 func inKeyGroup(k termbox.Key, r rune, keys []termbox.Key, runes []rune) bool {
 	if r == rune(0) {
 		return contains(keys, k)
