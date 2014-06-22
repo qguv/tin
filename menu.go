@@ -25,6 +25,7 @@ func putStringCentered(y int, fg, bg termbox.Attribute, msg string) {
 // putUserMessage displays a centered message to the user in white at the given
 // height.
 func putUserMessage(m string, h int) {
+	m = smallText(m)
 	putStringCentered(h, termbox.ColorWhite, termbox.ColorDefault, m)
 }
 
@@ -162,6 +163,40 @@ func advanceStars(stars []star) {
 	}
 }
 
+func inKeyGroup(k termbox.Key, r rune, keys []termbox.Key, runes []rune) bool {
+	if r == rune(0) {
+		return contains(keys, k)
+	} else {
+		return contains(runes, r)
+	}
+}
+
+func isDownKey(k termbox.Key, r rune) bool {
+	downKeys := []termbox.Key{
+		termbox.KeyArrowDown,
+		termbox.KeyPgdn,
+	}
+	downRunes := []rune{
+		's', 'S',
+		'j', 'J',
+	}
+	return inKeyGroup(k, r, downKeys, downRunes)
+}
+
+func isUpKey(k termbox.Key, r rune) bool {
+	upKeys := []termbox.Key{
+		termbox.KeyArrowUp,
+		termbox.KeyPgup,
+	}
+	upRunes := []rune{
+		'w', 'W',
+		'k', 'K',
+	}
+	return inKeyGroup(k, r, upKeys, upRunes)
+}
+
+// displayMainMenu does just that. Call this from main() if you want to run
+// this part of the code.
 func displayMainMenu() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -184,6 +219,7 @@ func displayMainMenu() {
 	go advanceStars(stars)
 
 	var calibrate bool
+	var selected int
 
 gameLoop:
 	for {
@@ -191,13 +227,17 @@ gameLoop:
 		case ev := <-event_queue:
 			switch ev.Type {
 			case termbox.EventKey:
-				switch ev.Key {
-				case termbox.KeyEsc:
-					calibrate = false
-				case termbox.KeyCtrlC:
+				switch {
+				case ev.Key == termbox.KeyCtrlC:
 					break gameLoop
-				case termbox.KeySpace:
-					calibrate = true
+				case ev.Key == termbox.KeySpace:
+					calibrate = !calibrate
+				case ev.Key == termbox.KeyEsc:
+					calibrate = false
+				case isUpKey(ev.Key, ev.Ch):
+					selected--
+				case isDownKey(ev.Key, ev.Ch):
+					selected++
 				}
 			}
 		default:
