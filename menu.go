@@ -20,7 +20,8 @@ func tbcenterwidth(y int, fg, bg termbox.Attribute, msg string) {
 
 func drawCalibrateReminder() {
 	_, h := termbox.Size()
-	tbph("SPACE to calibrate", h-1)
+	tbph("SPACE to calibrate", h-2)
+	tbph("Ctrl-C to quit", h-1)
 }
 
 func tbph(m string, h int) {
@@ -30,6 +31,17 @@ func tbph(m string, h int) {
 func drawTinLogo() {
 	_, h := termbox.Size()
 	midh := h / 2
+
+	adjustMessage_raw := `
+                            
+ adjust text size until 
+ all characters are legible 
+                            
+	`
+	adjustMessage := stringToLines(adjustMessage_raw)
+	for i, s := range adjustMessage {
+		tbph(s, i+1)
+	}
 
 	logo_raw := `
                        
@@ -47,21 +59,10 @@ func drawTinLogo() {
 	logo := stringToLines(logo_raw)
 	logo_h := len(logo)
 
-	top := midh - logo_h/2
+	top := midh - logo_h/2 + 1
 
 	for i, line := range logo {
 		tbph(line, top+i)
-	}
-
-	adjustMessage_raw := `
-                            
- adjust text size until 
- all characters are legible 
-                            
-	`
-	adjustMessage := stringToLines(adjustMessage_raw)
-	for i, s := range adjustMessage {
-		tbph(s, i+1)
 	}
 
 	tbph("ESC exits", h-1)
