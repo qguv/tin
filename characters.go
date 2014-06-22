@@ -4,9 +4,41 @@ import "math/rand"
 
 // equiped represents the equipment that a character is wearing / weilding.
 type equipped struct {
-	armor  map[armor]armorEquip
-	weapon weaponEquip
-	tool   toolEquip
+	armor  map[armor]*armorEquip
+	weapon *weaponEquip
+	tool   *toolEquip
+}
+
+func (p *person) carryCapacity() int {
+	return calcDamageRatio(p.weight, 50+p.attributes.strength)
+}
+
+func (p *person) carry(i carriable) {
+	if p.carryCapacity()-p.carriedWeight <= i.getWeight() {
+		p.carried = append(p.carried, i)
+		p.carriedWeight += i.getWeight()
+	}
+}
+
+func (p *person) equipArmor(a *armorEquip) {
+	p.equipped.armor[a.armor].dequip()
+	p.equipped.armor[a.armor] = a
+
+	for x, _ := range p.bodyParts {
+		if p.bodyParts[x].bodyPart.armorType() == a.armor {
+			p.bodyParts[x].armor = a
+		}
+	}
+}
+
+func (p *person) equipWeapon(w *weaponEquip) {
+	p.equipped.tool = nil
+	p.equipped.weapon = w
+}
+
+func (p *person) equipTool(t *toolEquip) {
+	p.equipped.weapon = nil
+	p.equipped.tool = t
 }
 
 // profession represents a characters general catagory of work.
@@ -47,22 +79,38 @@ type person struct {
 	attributes
 	equipped
 	health
-	name       string
-	age        int
-	male       bool
-	profession profession
-	nobility   nobility
-	father     *person
-	mother     *person
-	carried    []carriable
-	holdings   []ownable
+	name          string
+	age           int
+	male          bool
+	weight        int
+	height        int
+	carriedWeight int
+	profession    profession
+	nobility      nobility
+	father        *person
+	mother        *person
+	carried       []carriable
+	holdings      []ownable
 }
 
 // getWeaponSkill returns the characters skill in using his equipped weapon.
 // returns 0 if nothing equipped.
 func (p *person) getWeaponSkill() int {
-	weapon := p.equipped.weapon.weapon
-	return p.skills.weapons[weapon]
+	return p.skills.weapons[p.getCurrentWeapon().weapon]
+}
+
+func (p *person) getCurrentWeapon() *weaponEquip {
+	if p.equipped.weapon == nil {
+		return &weaponEquip{
+			equipment: equipment{
+				owner: p,
+			},
+			maxDamage: 20,
+			bluntness: 100,
+		}
+	} else {
+		return p.equipped.weapon
+	}
 }
 
 // randPerson randomly chooses a profession,
@@ -92,10 +140,5 @@ func newPerson(p profession) person {
 		health:     newPersonHealth(),
 	}
 
-	person.equipped.weapon = weaponEquip{
-		equipment: equipment{
-			owner: &person,
-		},
-	}
 	return person
 }

@@ -49,6 +49,33 @@ func (b bodyPart) String() string {
 	}
 }
 
+func (b bodyPart) armorType() armor {
+	switch b {
+	case head:
+		return helmet
+	case chest:
+		return chestplate
+	case rArm:
+		return chestplate
+	case lArm:
+		return chestplate
+	case rHand:
+		return gauntlets
+	case lHand:
+		return gauntlets
+	case rLeg:
+		return greaves
+	case lLeg:
+		return greaves
+	case rFoot:
+		return boots
+	case lFoot:
+		return boots
+	default:
+		return shield
+	}
+}
+
 // bodyPartInstance is an instance of a body part with status.
 type bodyPartInstance struct {
 	bodyPart bodyPart

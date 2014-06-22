@@ -64,7 +64,7 @@ func (b *bodyPart) getAccNeeded() int {
 
 func (p *person) attack(t *person) {
 	target := p.chooseTarget(*t)
-	fmt.Printf("%s aims his %s at %s's %s\n", p.name, p.weapon.weapon, t.name, target)
+	fmt.Printf("%s aims his %s at %s's %s\n", p.name, p.getCurrentWeapon().weapon, t.name, target)
 	p.attackBodyPart(t, target)
 }
 
@@ -110,7 +110,7 @@ func (p *person) attackBodyPart(t *person, bp bodyPart) {
 	t.checkHealth()
 
 	// reduce weapon durability
-	p.equipped.weapon.reduceDurability(damage, *t.getBodyPart(bp))
+	p.getCurrentWeapon().reduceDurability(damage, *t.getBodyPart(bp))
 
 }
 
@@ -118,16 +118,11 @@ func (p *person) attackBodyPart(t *person, bp bodyPart) {
 func (p *person) rollDamage() int {
 	var max int
 
-	if p.equipped.weapon.weapon == fist {
-		max = 20 + p.strength + p.getWeaponSkill()
-	} else {
+	max = p.getCurrentWeapon().maxDamage + p.strength + p.getWeaponSkill()
 
-		max = p.equipped.weapon.maxDamage + p.strength + p.getWeaponSkill()
-	}
+	roll := rand.Int31n(int32(max) - int32(p.getCurrentWeapon().minDamage))
 
-	roll := rand.Int31n(int32(max) - int32(p.equipped.weapon.minDamage))
-
-	return int(roll) + p.equipped.weapon.minDamage
+	return int(roll) + p.getCurrentWeapon().minDamage
 }
 
 // rollAccuracy returns the differance between roll and needed to hit

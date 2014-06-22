@@ -61,7 +61,7 @@ func TestAttackBodyPart(t *testing.T) {
 	}
 
 	defender.getBodyPart(chest).armor = &armor
-	attacker.equipped.weapon = weapon
+	attacker.equipWeapon(&weapon)
 
 	for defender.getBodyPart(chest).health > 0 {
 		attacker.attackBodyPart(&defender, chest)

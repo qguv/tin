@@ -147,10 +147,25 @@ type weaponEquip struct {
 }
 
 func (w *weaponEquip) dequip() {
-	w.getOwner().equipped.weapon = weaponEquip{
-		equipment: equipment{owner: w.getOwner()},
-	}
+	w.getOwner().equipped.weapon = nil
 }
+
+func (a *armorEquip) dequip() {
+	bps := &a.getOwner().health.bodyParts
+
+	for x, bp := range *bps {
+		if bp.armor == a {
+			a.getOwner().health.bodyParts[x].armor = nil
+		}
+	}
+
+	a.getOwner().equipped.armor[a.armor] = nil
+}
+
+func (t *toolEquip) dequip() {
+	t.getOwner().equipped.tool = nil
+}
+
 func (w *weaponEquip) reduceDurability(damage int, bp bodyPartInstance) {
 
 	const minRedux int = 5
@@ -158,11 +173,11 @@ func (w *weaponEquip) reduceDurability(damage int, bp bodyPartInstance) {
 	var redux int
 	armor := bp.armor
 
-	blunt := calcDamageRatio(damage, w.getWeaponBluntness())
-	cut := calcDamageRatio(damage, w.getWeaponSharpness())
+	blunt := calcDamageRatio(damage, w.bluntness)
+	cut := calcDamageRatio(damage, w.sharpness)
 
 	if armor != nil {
-		tblunt, tcut := armor.takeDamage(damage, w.getWeaponBluntness(), w.getWeaponSharpness())
+		tblunt, tcut := armor.takeDamage(damage, w.bluntness, w.sharpness)
 		blocked := blunt - tblunt + cut - tcut
 		redux = calcDamageRatio(blocked, 100-w.strength)
 	}
@@ -180,28 +195,12 @@ func (w *weaponEquip) reduceDurability(damage int, bp bodyPartInstance) {
 
 }
 
-func (w *equipped) getWeaponBluntness() int {
-	return w.weapon.getWeaponBluntness()
+func (p *person) getWeaponBluntness() int {
+	return p.getCurrentWeapon().bluntness
 }
 
-func (w *equipped) getWeaponSharpness() int {
-	return w.weapon.getWeaponBluntness()
-}
-
-func (w *weaponEquip) getWeaponBluntness() int {
-	if w.weapon == fist {
-		return 100
-	} else {
-		return w.bluntness
-	}
-}
-
-func (w *weaponEquip) getWeaponSharpness() int {
-	if w.weapon == fist {
-		return 0
-	} else {
-		return w.sharpness
-	}
+func (p *person) getWeaponSharpness() int {
+	return p.getCurrentWeapon().sharpness
 }
 
 // armorEquip is an armor instance.
