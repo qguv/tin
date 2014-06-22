@@ -61,7 +61,7 @@ func TestAttackBodyPart(t *testing.T) {
 	}
 
 	defender.getBodyPart(chest).armor = &armor
-	attacker.equipWeapon(&weapon)
+	attacker.equip(&weapon)
 
 	for defender.getBodyPart(chest).health > 0 {
 		attacker.attackBodyPart(&defender, chest)
@@ -89,5 +89,6 @@ func TestAttack(t *testing.T) {
 	for defender.health.unconscious == false {
 		attacker.attack(&defender)
 		fmt.Println(defender.health)
+		fmt.Println(defender.movementCapacity())
 	}
 }

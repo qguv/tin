@@ -131,24 +131,28 @@ func (p *person) rollAccuracy(t *person, bp bodyPart) int {
 
 	accuracy := p.getWeaponSkill() + p.accuracy + p.agility
 
+	moveAbility := int(float32(p.health.stamina)*p.movementCapacity() + .5)
+	tMoveAbility := int(float32(t.health.stamina)*t.movementCapacity() + .5)
+
 	// apply target dodge attempt
-	dodge := calcDamageRatio(t.agility,
-		intRoundDiv((int(t.movementCapacity())+t.agility), 2))
-
-	if dodge >= accuracy {
-		accuracy = 0
-	} else {
-		accuracy -= dodge
-	}
-
-	accuracy = calcDamageRatio(accuracy,
-		intRoundDiv(p.health.stamina+int(p.movementCapacity()), 2))
+	dodge := t.agility
 
 	need := bp.getAccNeeded()
 
 	need -= int(float32(accuracy)/30*50 + .5)
+	need += int(float32(dodge)/10*50 + .5)
+
+	abilityDiff := percentDiff(moveAbility, tMoveAbility)
+
+	if moveAbility > tMoveAbility {
+		need -= int(float64(need)*abilityDiff + .5)
+	} else {
+		need += int(float64(need)*abilityDiff + .5)
+	}
 
 	roll := rand.Int31n(100)
+
+	fmt.Printf("acc: %d dodge: %d need: %d roll: %d\n", accuracy, dodge, need, roll)
 
 	return int(roll) - need
 

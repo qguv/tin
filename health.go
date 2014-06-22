@@ -208,6 +208,8 @@ func (h *health) movementCapacity() float32 {
 
 	capacity /= float32(math.Exp2(float64(disabled)))
 
+	//TODO factor in carried item weight
+
 	return capacity
 
 }

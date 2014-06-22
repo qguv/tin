@@ -114,6 +114,12 @@ type carriable interface {
 	getWeight() int
 }
 
+type equipable interface {
+	equip(*person)
+	getOwner() *person
+	getWeight() int
+}
+
 // ownable interface allows a character to own something
 type ownable interface {
 	getOwner() *person
@@ -144,6 +150,27 @@ type weaponEquip struct {
 	maxDamage int
 	sharpness int
 	bluntness int
+}
+
+func (a *armorEquip) equip(p *person) {
+	p.equipped.armor[a.armor].dequip()
+	p.equipped.armor[a.armor] = a
+
+	for x, _ := range p.bodyParts {
+		if p.bodyParts[x].bodyPart.armorType() == a.armor {
+			p.bodyParts[x].armor = a
+		}
+	}
+}
+
+func (w *weaponEquip) equip(p *person) {
+	p.equipped.tool = nil
+	p.equipped.weapon = w
+}
+
+func (t *toolEquip) equipTool(p *person) {
+	p.equipped.weapon = nil
+	p.equipped.tool = t
 }
 
 func (w *weaponEquip) dequip() {

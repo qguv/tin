@@ -13,32 +13,32 @@ func (p *person) carryCapacity() int {
 	return calcDamageRatio(p.weight, 50+p.attributes.strength)
 }
 
-func (p *person) carry(i carriable) {
-	if p.carryCapacity()-p.carriedWeight <= i.getWeight() {
-		p.carried = append(p.carried, i)
-		p.carriedWeight += i.getWeight()
+func (p *person) isCarrying(i carriable) bool {
+	for _, car := range p.carried {
+		if car == i {
+			return true
+		}
 	}
+	return false
 }
 
-func (p *person) equipArmor(a *armorEquip) {
-	p.equipped.armor[a.armor].dequip()
-	p.equipped.armor[a.armor] = a
+func (p *person) carry(i carriable) {
+	if !p.isCarrying(i) {
 
-	for x, _ := range p.bodyParts {
-		if p.bodyParts[x].bodyPart.armorType() == a.armor {
-			p.bodyParts[x].armor = a
+		if p.carryCapacity()-p.carriedWeight <= i.getWeight() {
+			p.carried = append(p.carried, i)
+			p.carriedWeight += i.getWeight()
 		}
 	}
 }
 
-func (p *person) equipWeapon(w *weaponEquip) {
-	p.equipped.tool = nil
-	p.equipped.weapon = w
-}
+func (p *person) equip(e equipable) {
 
-func (p *person) equipTool(t *toolEquip) {
-	p.equipped.weapon = nil
-	p.equipped.tool = t
+	p.carry(e)
+
+	if p.isCarrying(e) {
+		e.equip(p)
+	}
 }
 
 // profession represents a characters general catagory of work.

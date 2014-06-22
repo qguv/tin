@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"math"
+	"strings"
+)
 
 func contains(list []interface{}, elem interface{}) bool {
 	for _, t := range list {
@@ -21,4 +24,10 @@ func stringToLines(raw string) (out []string) {
 	out = out[1:h]
 
 	return
+}
+
+func percentDiff(num int, num2 int) float64 {
+	diff := math.Abs(float64(num - num2))
+	avg := float64(num+num2) / 2
+	return diff / avg
 }
