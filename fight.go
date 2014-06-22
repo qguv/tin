@@ -45,21 +45,27 @@ type attackable interface {
 func (b *bodyPart) getAccNeeded() int {
 	switch *b {
 	case head:
-		return 70
+		return 60
 	case lArm:
-		return 80
+		return 70
 	case rArm:
-		return 80
+		return 70
 	case lLeg:
-		return 80
+		return 70
 	case rLeg:
-		return 80
+		return 70
 	case chest:
 		return 50
 	default:
-		return 90
+		return 85
 
 	}
+}
+
+func (p *person) attack(t *person) {
+	target := p.chooseTarget(*t)
+	fmt.Printf("%s aims his %s at %s's %s\n", p.name, p.weapon.weapon, t.name, target)
+	p.attackBodyPart(t, target)
 }
 
 // attack causes a character to attempt to hit the target area
@@ -73,15 +79,19 @@ func (p *person) attackBodyPart(t *person, bp bodyPart) {
 	if accuracy >= 0 {
 		if accuracy >= 20 {
 			contact = 100
+			fmt.Printf("A solid hit!\n")
 		} else {
 			contact = int(float32(accuracy)/20*100 + .5)
+			fmt.Printf("%d contact\n", contact)
 		}
 	} else {
 		if accuracy >= -20 {
 			bp = bodyPart(rand.Int31n(numBodyParts - 1))
 			contact = int(rand.Int31n(50))
+			fmt.Printf("Misses, but hits %s\n", bp)
 		} else {
 			contact = 0
+			fmt.Printf("%s dodges the blow!\n", t.name)
 		}
 
 	}
@@ -96,6 +106,9 @@ func (p *person) attackBodyPart(t *person, bp bodyPart) {
 	// fmt.Println(target)
 	target.takeAttack(damage, p.getWeaponBluntness(), p.getWeaponSharpness())
 
+	// update target health
+	t.checkHealth()
+
 	// reduce weapon durability
 	p.equipped.weapon.reduceDurability(damage, *t.getBodyPart(bp))
 
@@ -106,7 +119,7 @@ func (p *person) rollDamage() int {
 	var max int
 
 	if p.equipped.weapon.weapon == fist {
-		max = 5 + p.strength + p.getWeaponSkill()
+		max = 20 + p.strength + p.getWeaponSkill()
 	} else {
 
 		max = p.equipped.weapon.maxDamage + p.strength + p.getWeaponSkill()
@@ -228,19 +241,27 @@ func (p *person) chooseTarget(t person) bodyPart {
 		if target.armor != nil {
 			blunt, cut = target.armor.takeDamage(wdamage, wblunt, wcut)
 		} else {
-			blunt = wblunt
-			cut = wcut
+			blunt = calcDamageRatio(wdamage, wblunt)
+			cut = calcDamageRatio(wdamage, wcut)
 		}
 
 		damage := blunt + cut
+
+		if target.health-damage <= 0 {
+			damage = target.health
+		}
+
 		chance := 100 - target.bodyPart.getAccNeeded()
 
 		damage = calcDamageRatio(damage, chance)
-		fmt.Println(damage)
 
 		if damage > maxDamage {
 			maxDamage = damage
 			maxTarget = target.bodyPart
+		} else if damage == maxDamage {
+			if rand.Int31n(2) == 1 {
+				maxTarget = target.bodyPart
+			}
 		}
 
 	}

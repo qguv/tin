@@ -85,10 +85,17 @@ func randPerson() person {
 // newPerson initializes a person with skill distribution
 // based on chosen profession.
 func newPerson(p profession) person {
-	return person{
+	person := person{
 		profession: p,
 		skills:     newSkills(p),
 		attributes: newAttributes(p),
 		health:     newPersonHealth(),
 	}
+
+	person.equipped.weapon = weaponEquip{
+		equipment: equipment{
+			owner: &person,
+		},
+	}
+	return person
 }

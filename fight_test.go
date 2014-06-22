@@ -78,3 +78,17 @@ func TestGetTarget(t *testing.T) {
 	target := attacker.chooseTarget(defender)
 	fmt.Println(target)
 }
+
+func TestAttack(t *testing.T) {
+	attacker := randPerson()
+	defender := randPerson()
+
+	attacker.name = "Cody"
+	defender.name = "Quint"
+
+	for defender.health.unconscious == false {
+		attacker.attack(&defender)
+		fmt.Println(defender.health)
+		fmt.Println(attacker.rollDamage())
+	}
+}

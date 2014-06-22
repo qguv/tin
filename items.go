@@ -50,6 +50,29 @@ const (
 	numWeapons
 )
 
+func (w weapon) String() string {
+	switch w {
+	case fist:
+		return "fist"
+	case knife:
+		return "knife"
+	case sword:
+		return "sword"
+	case battleAxe:
+		return "battle-axe"
+	case warHammer:
+		return "warhammer"
+	case pike:
+		return "pike"
+	case bow:
+		return "bow"
+	case crossbow:
+		return "crossbow"
+	default:
+		return ""
+	}
+}
+
 // tool denotes the types of tools.
 type tool int
 
