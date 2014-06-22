@@ -89,6 +89,5 @@ func TestAttack(t *testing.T) {
 	for defender.health.unconscious == false {
 		attacker.attack(&defender)
 		fmt.Println(defender.health)
-		fmt.Println(attacker.rollDamage())
 	}
 }
