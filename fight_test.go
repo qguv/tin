@@ -83,8 +83,8 @@ func TestAttack(t *testing.T) {
 	attacker := randPerson()
 	defender := randPerson()
 
-	attacker.name = "Cody"
-	defender.name = "Quint"
+	attacker.name = "Quint"
+	defender.name = "the Java programming language"
 
 	for defender.health.unconscious == false {
 		attacker.attack(&defender)
