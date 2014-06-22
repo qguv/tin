@@ -158,7 +158,7 @@ func advanceStars(stars []star) {
 			stars[this] = newStarAt(0)
 		}
 
-		time.Sleep(3 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
@@ -180,7 +180,7 @@ func displayMainMenu() {
 		}
 	}()
 
-	stars := makeStars(20)
+	stars := makeStars(6)
 	go advanceStars(stars)
 
 	var calibrate bool
