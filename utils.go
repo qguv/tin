@@ -24,13 +24,27 @@ func contains(slice_raw interface{}, elem_raw interface{}) bool {
 	return false
 }
 
+// maxInt returns the earliest, greatest value in a slice
+func maxInt(slice []int) int {
+	greatest := slice[len(slice)-1]
+
+	for i := len(slice) - 2; i >= 0; i-- {
+		this := slice[i]
+		if this >= greatest {
+			greatest = this
+		}
+	}
+
+	return greatest
+}
+
 // stringToLines turns a string (probably a string literal) with an extra
 // newline on both sides into a slice of meaningful lines. Indentation is not
 // ignored.
 func stringToLines(raw string) (out []string) {
 	out = strings.Split(raw, "\n")
 	h := len(out)
-	out = out[1:h]
+	out = out[1 : h-1]
 
 	return
 }
