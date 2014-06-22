@@ -3,11 +3,19 @@ package main
 import (
 	"math"
 	"strings"
+	"reflect"
 )
 
-func contains(list []interface{}, elem interface{}) bool {
-	for _, t := range list {
-		if t == elem {
+func contains(slice_raw interface{}, elem_raw interface{}) bool {
+	elem_type := reflect.TypeOf(elem_raw)
+	if reflect.TypeOf(slice_raw) != reflect.SliceOf(elem_type) {
+		panic("arguments to contains are of different types!")
+	}
+
+	slice := reflect.ValueOf(slice_raw)
+
+	for i := 0; i < slice.Len(); i++ {
+		if slice.Index(i).Interface() == elem_raw {
 			return true
 		}
 	}
