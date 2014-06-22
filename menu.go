@@ -3,7 +3,7 @@ package main
 import termbox "github.com/nsf/termbox-go"
 import "time"
 import "unicode/utf8"
-import "strings"
+import "math/rand"
 
 func tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
 	for _, c := range msg {
@@ -26,18 +26,20 @@ func drawTinLogo() {
 	midh := h / 2
 
 	logo_raw := `
- ⚓︎   ☠   ♘   ⚒   ⚇
-   ╭─╮           
-♖ ╭╯ ╰┬─┬─────╮ ⎈
-  ╰╮ ╭┤ │ ┌─╮ │  
-♪  │ ││ │ │ │ │ ♔
-   └─┘└─┴─┘ └─┘  
- ⚗   ◎   ⚔   ✙   ✉︎
+                       
+ ╔═══════════════════╗ 
+  ║ ⚓︎   ☠   ♘   ⚒   ⚇ ║ 
+ ║    ╭─╮            ║ 
+ ║ ♖ ╭╯ ╰┬─┬─────╮ ⎈ ║ 
+ ║   ╰╮ ╭┤ │ ┌─╮ │   ║ 
+ ║ ♪  │ ││ │ │ │ │ ♔ ║ 
+ ║    └─┘└─┴─┘ └─┘   ║ 
+  ║ ⚗   ◎   ⚔   ✙   ✉︎ ║ 
+ ╚═══════════════════╝ 
+                       
 `
-	logo := strings.Split(logo_raw, "\n")
+	logo := stringToLines(logo_raw)
 	logo_h := len(logo)
-	logo = logo[1:logo_h]
-	logo_h = len(logo)
 
 	top := midh - logo_h/2
 
@@ -45,19 +47,102 @@ func drawTinLogo() {
 		tbph(line, top+i)
 	}
 
-	tbph("adjust text size until", 1)
-	tbph("all characters are legible", 2)
+	adjustMessage_raw := `
+                            
+ adjust text size until 
+ all characters are legible 
+                            
+	`
+	adjustMessage := stringToLines(adjustMessage_raw)
+	for i, s := range adjustMessage {
+		tbph(s, i+1)
+	}
+
 	tbph("ESC exits", h-1)
 }
 
+type star struct {
+	x, y       int
+	generation int
+	dead       bool
+}
+
+const STAR_GENERATION_COUNT int = 9
+
+func newStarAt(generation int) star {
+	h, w := termbox.Size()
+	y := rand.Intn(w)
+	x := rand.Intn(h)
+
+	return star{
+		x:          x,
+		y:          y,
+		generation: generation,
+	}
+}
+
+func newStar() star {
+	g := rand.Intn(STAR_GENERATION_COUNT)
+	return newStarAt(g)
+}
+
+func (s *star) advance() {
+	s.generation++
+	if s.generation >= STAR_GENERATION_COUNT {
+		s.dead = true
+	}
+}
+
+func (s star) show() {
+	thinEightPointStar := '\u2734'
+	glyphs := []rune{
+		'✢', '✧',
+		'✶', '✵', '❃',
+		'✷', thinEightPointStar,
+		'✧', '◦',
+	}
+
+	r := glyphs[s.generation]
+	termbox.SetCell(s.x, s.y, r, termbox.ColorWhite, termbox.ColorDefault)
+}
+
+func showStars(stars []star) {
+	for _, star := range stars {
+		star.show()
+	}
+}
+
+func makeStars(count int) []star {
+	stars := make([]star, count)
+	for i := 0; i < count; i++ {
+		stars[i] = newStar()
+	}
+	return stars
+}
+
+func advanceStars(stars []star) {
+	for {
+		this := rand.Intn(len(stars))
+		s := &stars[this]
+		s.advance()
+		if s.dead {
+			stars[this] = newStarAt(0)
+		}
+
+		time.Sleep(3 * time.Millisecond)
+	}
+}
+
 func runGameLoop() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	err := termbox.Init()
-	defer termbox.Close()
 	if err != nil {
 		panic(err)
 	}
-
+	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputEsc)
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	event_queue := make(chan termbox.Event)
 	go func() {
@@ -66,9 +151,8 @@ func runGameLoop() {
 		}
 	}()
 
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-	drawTinLogo()
-	termbox.Flush()
+	stars := makeStars(20)
+	go advanceStars(stars)
 
 gameLoop:
 	for {
@@ -84,13 +168,13 @@ gameLoop:
 				case termbox.KeySpace:
 					// do nothing
 				}
-			case termbox.EventResize:
-				termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-				drawTinLogo()
-				termbox.Flush()
 			}
 		default:
+			showStars(stars)
+			drawTinLogo()
+			termbox.Flush()
 			time.Sleep(10 * time.Millisecond)
+			termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 		}
 	}
 }
