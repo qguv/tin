@@ -206,7 +206,34 @@ const (
 	magicMerchants     = 1000
 )
 
-//TODO officeType
+type officeType int
+
+const (
+	livestockMerchants = 200
+	carpenters         = 360
+	masonsO            = 474
+	pawnbrokerO        = 546
+	wineMerchantsO     = 611
+	doctorsUnlicensed  = 661
+	woolMerchantsO     = 706
+	beerMerchantsO     = 756
+	spceMerchants      = 786
+	doctorsLicensed    = 815
+	copyists           = 842
+	moneychangers      = 864
+	scholar            = 884
+	advocates          = 902
+	historians         = 918
+	engineers          = 931
+	architects         = 941
+	astrologers        = 951
+	grainMerchantsO    = 961
+	tobaccoMerchantsO  = 971
+	bankers            = 980
+	slavers            = 989
+	cartographers      = 997
+	magicMerchantsO    = 1000
+)
 
 type buildingStyle int
 
