@@ -3,24 +3,35 @@ package main
 type biome int
 
 const (
-	desert = iota
-	mountians
-	plains
+
+	// low elevation (Norfolk, Holland, the tropics)
+	desert biome = iota
 	lowlands
-	tundra
-	forest
 	jungle
-	hills
-	swamp
-	// water related
+
+	// water-related (sea level)
 	coast
 	ocean
 	river
 	lake
 	haven
+
+	// mid elevation (Common)
+	midlands
+	tundra
+	forest
+	hills
+	cliffs
+
+	// high elevation (Charlottesville, West Virginia)
+	highlands
+	mountians
+
+	// extreme (Colorado, Tibet) elevation
+	fourteeners
 )
 
-type manMadeType int
+type manmadeType int
 
 const (
 	castleM = iota
@@ -42,16 +53,16 @@ type owner interface {
 	getHoldings() []ownable
 }
 
-type manmadefeature interface {
+type manmadeFeature interface {
 	getOwner() *owner
 	getTile() *tile
-	getType() manMadeType
+	getType() manmadeType
 }
 
 type manmade struct {
 	name        string
 	owner       *owner
-	manMadeType manMadeType
+	manmadeType manmadeType
 	tile        *tile
 }
 
@@ -102,7 +113,7 @@ const (
 	weavers          = 293
 	basketMakers     = 335
 	carpenders       = 377
-	parchmentmakers  = 419
+	parchmentMakers  = 419
 	potters          = 461
 	wheelwrights     = 499
 	jewlers          = 534
@@ -121,7 +132,7 @@ const (
 	toymakers        = 771
 	artists          = 782
 	leatherworkers   = 793
-	ropemakers       = 803
+	ropeMakers       = 803
 	tanners          = 813
 	buckleMakers     = 822
 	cutlers          = 831
@@ -129,8 +140,8 @@ const (
 	harnessMakers    = 849
 	painters         = 858
 	woodcarvers      = 866
-	glassmakers      = 873
-	instrumentmakers = 880
+	lampworkers      = 873
+	instrumentMakers = 880
 	locksmiths       = 887
 	rugMakers        = 894
 	sculptors        = 901
@@ -150,9 +161,9 @@ const (
 	potionMakers     = 983
 	clockMakers      = 986
 	taxidermists     = 989
-	vestmentmakers   = 992
+	sewists          = 992
 	alchemists       = 994
-	bellmakers       = 996
+	bellMakers       = 996
 	dyeMakers        = 998
 	inventors        = 1000
 )
@@ -160,8 +171,8 @@ const (
 type shopType int
 
 const (
-	clothiers          = 97
-	gorcers            = 194
+	outfitters         = 97
+	grocers            = 194
 	diarysellers       = 270
 	launderers         = 346
 	prostitutes        = 422
@@ -169,12 +180,12 @@ const (
 	tailors            = 558
 	barbers            = 607
 	drapers            = 656
-	flowersellers      = 705
+	flowerSellers      = 705
 	jewelers           = 745
 	mercers            = 768
 	engravers          = 790
-	pawnbroker         = 812
-	haberdasher        = 832
+	pawnBrokers        = 812
+	haberdashers       = 832
 	wineMerchants      = 852
 	tinkers            = 868
 	butchers           = 883
@@ -190,8 +201,8 @@ const (
 	religiousSouvenirs = 985
 	dentists           = 989
 	navelOutfitters    = 993
-	grainMerchants     = 996
-	tobaccoMerchants   = 999
+	grainers           = 996
+	tobacconists       = 999
 	magicMerchants     = 1000
 )
 
@@ -200,10 +211,10 @@ const (
 type buildingStyle int
 
 const (
-	derelict = iota
-	basic
-	ornate
-	imperial
+	derelictStyle = iota
+	basicStyle
+	ornateStyle
+	imperialStyle
 )
 
 type structure struct {
@@ -214,17 +225,17 @@ type structure struct {
 type districtType int
 
 const (
-	slum = iota
-	gate
-	sea
+	slumDistrict = iota
+	gateDistrict
+	seaDistrict
 	industrial
-	riverD
-	militaryD
-	craftsmen
-	merchantD
-	administrative
-	market
-	patriciate
+	riverDistrict
+	militaryDistrict
+	craftDistrict
+	merchantDistrict
+	administrativeDistrict
+	marketDistrict
+	patriciateDistrict
 )
 
 type district struct {
@@ -261,7 +272,7 @@ type tile struct {
 	location
 	claimedBy      *owner
 	biome          biome
-	manmadefeature *manmadefeature
+	manmadeFeature *manmadeFeature
 	roughness      int
 	wildness       int
 }
