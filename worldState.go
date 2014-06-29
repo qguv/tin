@@ -268,7 +268,12 @@ const (
 type district struct {
 	location
 	districtType districtType
-	structures   []structure
+	blocks       []block
+}
+
+type block struct {
+	location
+	structures []structure
 }
 
 type settlement struct {
