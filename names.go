@@ -125,7 +125,12 @@ func (n name) String(r *rand.Rand) (s string) {
 				// If we're adding a bare vowel, we need to add a macron iff
 				// the last vowel is the same
 				if strings.HasSuffix(s, vowel) {
-					s += "\u0304" //combining macron above
+
+					// append a "combining macron above" to the string
+					s += "\u0304"
+
+					// NFC-normalize:
+					// combines the macron with the previous character
 					s = string(norm.NFC.Bytes([]byte(s)))
 
 					// Otherwise, just add the vowel
