@@ -1,6 +1,6 @@
 package main
 
-type biome int
+type biome uint8
 
 const (
 
@@ -31,10 +31,10 @@ const (
 	fourteeners
 )
 
-type manmadeType int
+type manmadeType uint8
 
 const (
-	castleM = iota
+	castleM manmadeType = iota
 	town
 	village
 	keep
@@ -66,10 +66,10 @@ type manmade struct {
 	tile        *tile
 }
 
-type structureType int
+type structureType uint8
 
 const (
-	admin = iota
+	admin structureType = iota
 	asylum
 	barrack
 	bath
@@ -235,10 +235,10 @@ const (
 	magicMerchantsO    = 1000
 )
 
-type buildingStyle int
+type buildingStyle uint8
 
 const (
-	derelictStyle = iota
+	derelictStyle buildingStyle = iota
 	basicStyle
 	ornateStyle
 	imperialStyle
@@ -249,10 +249,10 @@ type structure struct {
 	buildingStyle buildingStyle
 }
 
-type districtType int
+type districtType uint8
 
 const (
-	slumDistrict = iota
+	slumDistrict districtType = iota
 	gateDistrict
 	seaDistrict
 	industrial
@@ -291,12 +291,7 @@ type popGroup struct {
 }
 
 type naturalResources struct {
-	trees      int
-	stone      int
-	tin        int
-	copper     int
-	iron       int
-	adamantine int
+	trees, stone, tin, copper, iron, adamantine int
 }
 
 type tile struct {

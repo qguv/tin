@@ -1,19 +1,19 @@
 package main
 
-type arbor int
+type arbor uint8
 
 const (
-	oak = iota
+	oak arbor = iota
 	maple
 	cherry
 	pine
 	ash
 )
 
-type crops int
+type crop uint8
 
 const (
-	wheat = iota
+	wheat crop = iota
 	fruit
 	vegetables
 	tobacco
@@ -21,10 +21,10 @@ const (
 	cotton
 )
 
-type mineralOre int
+type mineralOre uint8
 
 const (
-	stoneOre = iota
+	stoneOre mineralOre = iota
 	copperOre
 	tinOre
 	ironOre
@@ -33,20 +33,20 @@ const (
 	adamantineOre
 )
 
-type wildlife int
+type wildlife uint8
 
 const (
-	bear = iota
+	bear wildlife = iota
 	buffalo
 	stag
 	boar
 	elephant
 )
 
-type domesticated int
+type domesticated uint8
 
 const (
-	hound = iota
+	hound domesticated = iota
 	sheep
 	goat
 	chicken
