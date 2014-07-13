@@ -1,7 +1,11 @@
 package main
 
-import "math/rand"
-import "unicode"
+import (
+	"code.google.com/p/go.text/unicode/norm"
+	"math/rand"
+	"strings"
+	"unicode"
+)
 
 type language uint8
 
@@ -61,7 +65,6 @@ func (n name) String(r *rand.Rand) (s string) {
 
 		// standard syllabary
 		standard := []string{
-			"a", "i", "u", "e", "o",
 			"ka", "ki", "ku", "ke", "ko",
 			"sa", "shi", "su", "se", "so",
 			"ta", "chi", "tsu", "te", "to",
@@ -71,6 +74,12 @@ func (n name) String(r *rand.Rand) (s string) {
 			"ya", "yu", "yo",
 			"ra", "ri", "ru", "re", "ro",
 			"wa", "wo",
+		}
+
+		// these come up a lot
+		// (japan likes its vowels)
+		bareVowels := []string{
+			"a", "i", "u", "e", "o",
 		}
 
 		// syllabary plus dakuten
@@ -98,17 +107,31 @@ func (n name) String(r *rand.Rand) (s string) {
 		}
 
 		for i := 0; i < syllableCount; i++ {
-			where := r.Intn(6)
+			where := r.Intn(9)
 			switch {
-			case where == 5:
+			case where == 8:
 				i_extended := r.Intn(len(extended))
 				s += extended[i_extended]
-			case where > 2:
+			case where > 5:
 				i_additional := r.Intn(len(additional))
 				s += additional[i_additional]
-			default:
+			case where > 2:
 				i_standard := r.Intn(len(standard))
 				s += standard[i_standard]
+			default:
+				i_vowel := r.Intn(len(bareVowels))
+				vowel := bareVowels[i_vowel]
+
+				// If we're adding a bare vowel, we need to add a macron iff
+				// the last vowel is the same
+				if strings.HasSuffix(s, vowel) {
+					s += "\u0304" //combining macron above
+					s = string(norm.NFC.Bytes([]byte(s)))
+
+					// Otherwise, just add the vowel
+				} else {
+					s += bareVowels[i_vowel]
+				}
 			}
 
 			if r.Intn(3) == 0 {
