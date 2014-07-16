@@ -138,30 +138,6 @@ func advanceStars(stars []star) {
 	}
 }
 
-func isDownKey(k termbox.Key, r rune) bool {
-	downKeys := []termbox.Key{
-		termbox.KeyArrowDown,
-		termbox.KeyPgdn,
-	}
-	downRunes := []rune{
-		's', 'S',
-		'j', 'J',
-	}
-	return inKeyGroup(k, r, downKeys, downRunes)
-}
-
-func isUpKey(k termbox.Key, r rune) bool {
-	upKeys := []termbox.Key{
-		termbox.KeyArrowUp,
-		termbox.KeyPgup,
-	}
-	upRunes := []rune{
-		'w', 'W',
-		'k', 'K',
-	}
-	return inKeyGroup(k, r, upKeys, upRunes)
-}
-
 // displayMainMenu does just that. Call this from main() if you want to run
 // this part of the code.
 func displayMainMenu() {
