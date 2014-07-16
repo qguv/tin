@@ -99,3 +99,27 @@ func isUpKey(k termbox.Key, r rune) bool {
 func tbClear() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 }
+
+const (
+	Black      = termbox.ColorBlack
+	DarkRed    = termbox.ColorRed
+	DarkGreen  = termbox.ColorGreen
+	DarkOrange = termbox.ColorYellow
+	DarkBlue   = termbox.ColorBlue
+	DarkBrown  = termbox.ColorMagenta
+	DarkCyan   = termbox.ColorCyan
+	Grey       = termbox.ColorWhite
+
+	DarkGrey   = termbox.AttrBold | termbox.ColorBlack
+	Red        = termbox.AttrBold | termbox.ColorRed
+	Green      = termbox.AttrBold | termbox.ColorGreen
+	DarkYellow = termbox.AttrBold | termbox.ColorYellow
+	Blue       = termbox.AttrBold | termbox.ColorBlue
+	Brown      = termbox.AttrBold | termbox.ColorMagenta
+	Cyan       = termbox.AttrBold | termbox.ColorCyan
+	White      = termbox.AttrBold | termbox.ColorWhite
+)
+
+func mimicCell(x, y int, c termbox.Cell) {
+	termbox.SetCell(x, y, c.Ch, c.Fg, c.Bg)
+}

@@ -1,9 +1,10 @@
 package main
 
+import termbox "github.com/nsf/termbox-go"
+
 type biome uint8
 
 const (
-
 	// low elevation (Norfolk, Holland, the tropics)
 	desert biome = iota
 	lowlands
@@ -25,11 +26,32 @@ const (
 
 	// high elevation (Charlottesville, West Virginia)
 	highlands
-	mountians
+	mountains
 
 	// extreme (Colorado, Tibet) elevation
 	fourteeners
+
+	biome_count
 )
+
+var biomeCells = map[biome]termbox.Cell{
+	desert:      termbox.Cell{'∾', White, DarkYellow},
+	lowlands:    termbox.Cell{'⨪', Brown, DarkGreen},
+	jungle:      termbox.Cell{'ꙟ', Cyan, DarkBrown},
+	coast:       termbox.Cell{'·', Blue, DarkGreen},
+	ocean:       termbox.Cell{'≈', Blue, DarkBlue},
+	river:       termbox.Cell{'⩬', Cyan, Blue},
+	lake:        termbox.Cell{'⩪', Cyan, DarkCyan},
+	haven:       termbox.Cell{'⩫', Cyan, DarkBlue},
+	midlands:    termbox.Cell{'⩦', Brown, Green},
+	tundra:      termbox.Cell{'⋄', White, Grey},
+	forest:      termbox.Cell{'ꙥ', Green, DarkBrown},
+	hills:       termbox.Cell{'∿', Green, DarkGreen},
+	cliffs:      termbox.Cell{'√', White, DarkGrey},
+	highlands:   termbox.Cell{'≏', DarkOrange, DarkGreen},
+	mountains:   termbox.Cell{'⩟', Grey, DarkGreen},
+	fourteeners: termbox.Cell{'⩓', White, Grey},
+}
 
 type manmadeType uint8
 
@@ -294,12 +316,21 @@ type naturalResources struct {
 	trees, stone, tin, copper, iron, adamantine int
 }
 
+type simpleTile struct{ biome }
+
+func (t simpleTile) Cell() termbox.Cell {
+	return biomeCells[t.biome]
+}
+
 type tile struct {
 	naturalResources
 	location
-	claimedBy      *owner
-	biome          biome
-	manmadeFeature *manmadeFeature
-	roughness      int
-	wildness       int
+	biome
+	claimedBy           *owner
+	manmadeFeature      *manmadeFeature
+	roughness, wildness int
+}
+
+func (t tile) Cell() termbox.Cell {
+	return biomeCells[t.biome]
 }

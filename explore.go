@@ -12,29 +12,56 @@ func drawOutline() {
 	w, h := termbox.Size()
 	x_pad := (w - x_count) / 2
 	y_pad := (h - y_count) / 2
+	x_max := x_pad + x_count - 1
+	y_max := y_pad + y_count - 1
 
-	for y := y_pad; y < y_pad+26; y++ {
-		for x := x_pad; x < x_pad+84; x++ {
+	for y := y_pad; y <= y_max; y++ {
+		for x := x_pad; x <= x_max; x++ {
 			switch y {
 
-			// top line
 			case y_pad:
-				termbox.SetCell(x, y, '-', termbox.ColorWhite, termbox.ColorDefault)
+
+				// top-left cell
+				if x == x_pad {
+					termbox.SetCell(x, y, '╭', termbox.ColorWhite, termbox.ColorDefault)
+
+					// top-right cell
+				} else if x == x_max {
+					termbox.SetCell(x, y, '╮', termbox.ColorWhite, termbox.ColorDefault)
+
+					// top line
+				} else {
+					termbox.SetCell(x, y, '─', termbox.ColorWhite, termbox.ColorDefault)
+				}
 
 			// bottom line
-			case y_pad + y_count - 1:
-				termbox.SetCell(x, y, '-', termbox.ColorWhite, termbox.ColorDefault)
+			case y_max:
 
+				// bottom-left cell
+				if x == x_pad {
+					termbox.SetCell(x, y, '╰', termbox.ColorWhite, termbox.ColorDefault)
+
+					// bottom-right cell
+				} else if x == x_max {
+					termbox.SetCell(x, y, '╯', termbox.ColorWhite, termbox.ColorDefault)
+
+					// bottom line
+				} else {
+					termbox.SetCell(x, y, '─', termbox.ColorWhite, termbox.ColorDefault)
+				}
+
+			// vertically somewhere in the middle
 			default:
 				switch x {
 
 				// leftmost line
 				case x_pad:
-					termbox.SetCell(x, y, '|', termbox.ColorWhite, termbox.ColorDefault)
+					termbox.SetCell(x, y, '│', termbox.ColorWhite, termbox.ColorDefault)
 
 				// rightmost line
 				case x_pad + x_count - 1:
-					termbox.SetCell(x, y, '|', termbox.ColorWhite, termbox.ColorDefault)
+					termbox.SetCell(x, y, '│', termbox.ColorWhite, termbox.ColorDefault)
+
 				}
 			}
 		}
@@ -62,7 +89,11 @@ func displayWorldExplorer() {
 			m := <-redraw
 			tbClear()
 			drawOutline()
-			putMidScreen(m)
+			if m == "" {
+				testerWorld()
+			} else {
+				putMidScreen(m)
+			}
 			termbox.Flush()
 		}
 	}()
@@ -81,6 +112,9 @@ termboxLoop:
 				case ev.Key == termbox.KeyCtrlC:
 					break termboxLoop
 					// TODO: die
+
+				case ev.Key == termbox.KeyCtrlQ:
+					redraw <- ""
 
 				case ev.Key == termbox.KeyCtrlL:
 					termbox.Sync()
