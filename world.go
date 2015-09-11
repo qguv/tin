@@ -13,11 +13,9 @@ const (
 type world [WORLDHEIGHT][WORLDWIDTH]simpleTile
 type worldview [][]simpleTile
 
-func testerWorld() world {
-	var theWorld world
+func testerWorld() (theWorld world) {
 	var b biome
 	var t simpleTile
-
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	for y := 0; y < WORLDHEIGHT; y++ {
@@ -29,5 +27,5 @@ func testerWorld() world {
 		}
 	}
 
-	return theWorld
+	return
 }
